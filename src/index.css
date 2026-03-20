@@ -1,0 +1,112 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+/* Forced refresh comment */
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-serif: "Cormorant Garamond", serif;
+  
+  --color-accent: var(--accent-color);
+  --color-bg-main: var(--bg-main);
+  --color-bg-card: var(--bg-card);
+  --color-text-main: var(--text-main);
+  --color-text-muted: var(--text-muted);
+  --color-border-main: var(--border-color);
+}
+
+@layer base {
+  :root {
+    --bg-main: #F8F9FA;
+    --bg-card: #FFFFFF;
+    --text-main: #0F172A;
+    --text-muted: #64748B;
+    --border-color: #E2E8F0;
+    --accent-color: #4F46E5;
+    --skeleton-bg: #E2E8F0;
+  }
+
+  .dark {
+    --bg-main: #0F172A;
+    --bg-card: #1E293B;
+    --text-main: #F8FAFC;
+    --text-muted: #94A3B8;
+    --border-color: #334155;
+    --accent-color: #818CF8;
+    --skeleton-bg: #334155;
+  }
+
+  .red {
+    --bg-main: #FEF2F2;
+    --bg-card: #FFFFFF;
+    --text-main: #7F1D1D;
+    --text-muted: #B91C1C;
+    --border-color: #FEE2E2;
+    --accent-color: #DC2626;
+    --skeleton-bg: #FEE2E2;
+  }
+
+  .green {
+    --bg-main: #F0FDF4;
+    --bg-card: #FFFFFF;
+    --text-main: #064E3B;
+    --text-muted: #059669;
+    --border-color: #DCFCE7;
+    --accent-color: #10B981;
+    --skeleton-bg: #DCFCE7;
+  }
+
+  body {
+    @apply bg-[var(--bg-main)] text-[var(--text-main)];
+  }
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* Theme overrides */
+.dark .bg-white { @apply bg-slate-800; }
+.dark .bg-slate-50 { @apply bg-slate-900/50; }
+.dark .border-slate-200 { @apply border-slate-700; }
+.dark .text-slate-900 { @apply text-slate-100; }
+.dark .text-slate-700 { @apply text-slate-300; }
+.dark .text-slate-500 { @apply text-slate-400; }
+.dark .bg-slate-50\/50 { @apply bg-slate-900/30; }
+.dark .bg-slate-900 { @apply bg-slate-950; }
+.dark .border-slate-800 { @apply border-slate-900; }
+
+.red .bg-white { @apply bg-white; }
+.red .bg-slate-50 { @apply bg-red-50; }
+.red .border-slate-200 { @apply border-red-100; }
+.red .text-slate-900 { @apply text-red-900; }
+.red .text-slate-700 { @apply text-red-800; }
+.red .text-slate-500 { @apply text-red-600; }
+.red .bg-accent { @apply bg-red-600 hover:bg-red-700; }
+.red .text-accent { @apply text-red-600; }
+.red .bg-slate-900 { @apply bg-red-950; }
+.red .border-slate-800 { @apply border-red-900; }
+.red .hover\:bg-slate-800:hover { @apply bg-red-900; }
+
+.green .bg-white { @apply bg-white; }
+.green .bg-slate-50 { @apply bg-emerald-50; }
+.green .border-slate-200 { @apply border-emerald-100; }
+.green .text-slate-900 { @apply text-emerald-900; }
+.green .text-slate-700 { @apply text-emerald-800; }
+.green .text-slate-500 { @apply text-emerald-600; }
+.green .bg-accent { @apply bg-emerald-600 hover:bg-emerald-700; }
+.green .text-accent { @apply text-emerald-600; }
+.green .bg-slate-900 { @apply bg-emerald-950; }
+.green .border-slate-800 { @apply border-emerald-900; }
+.green .hover\:bg-slate-800:hover { @apply bg-emerald-900; }

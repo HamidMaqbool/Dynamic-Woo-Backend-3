@@ -1,0 +1,16 @@
+{
+  "stats": [
+    { "label": "Total Revenue", "value": "$128,430", "change": "+12.5%", "trend": "up", "icon": "dollar-sign" },
+    { "label": "Active Users", "value": "2,420", "change": "+3.2%", "trend": "up", "icon": "users" },
+    { "label": "New Orders", "value": "450", "change": "-1.5%", "trend": "down", "icon": "shopping-cart" },
+    { "label": "Conversion Rate", "value": "3.8%", "change": "+0.4%", "trend": "up", "icon": "activity" }
+  ],
+  "recentActivity": [
+    { "id": 1, "user": "John Doe", "action": "Purchased Auro Engine Oil", "time": "2 mins ago" },
+    { "id": 2, "user": "Jane Smith", "action": "Updated profile picture", "time": "15 mins ago" },
+    { "id": 3, "user": "Mike Ross", "action": "Requested a refund", "time": "1 hour ago" }
+  ],
+  "charts": {
+    "sales": [4000, 3000, 2000, 2780, 1890, 2390, 3490]
+  }
+}

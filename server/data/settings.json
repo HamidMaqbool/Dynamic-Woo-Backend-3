@@ -1,0 +1,312 @@
+{
+  "tabs": [
+    {
+      "id": "general",
+      "label": "General",
+      "icon": "settings",
+      "sections": [
+        {
+          "title": "Site Information",
+          "fields": [
+            {
+              "name": "siteName",
+              "label": "Site Name",
+              "type": "text",
+              "value": "AuroParts Admin"
+            },
+            {
+              "name": "siteDescription",
+              "label": "Site Description",
+              "type": "textarea",
+              "value": "Premium Auto Parts CRM"
+            },
+            {
+              "name": "contactEmail",
+              "label": "Contact Email",
+              "type": "email",
+              "value": "admin@auroparts.com"
+            }
+          ]
+        },
+        {
+          "title": "System Status",
+          "fields": [
+            {
+              "name": "maintenanceMode",
+              "label": "Maintenance Mode",
+              "type": "checkbox",
+              "value": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "appearance",
+      "label": "Appearance",
+      "icon": "layout",
+      "sections": [
+        {
+          "title": "Branding",
+          "fields": [
+            {
+              "name": "theme",
+              "label": "Default Theme",
+              "type": "select",
+              "value": "light",
+              "options": [
+                {
+                  "label": "Light",
+                  "value": "light"
+                },
+                {
+                  "label": "Dark",
+                  "value": "dark"
+                },
+                {
+                  "label": "Red",
+                  "value": "red"
+                },
+                {
+                  "label": "Green",
+                  "value": "green"
+                }
+              ]
+            },
+            {
+              "name": "primaryColor",
+              "label": "Primary Brand Color",
+              "type": "color",
+              "value": "#4F46E5"
+            }
+          ]
+        },
+        {
+          "title": "Sidebar",
+          "fields": [
+            {
+              "name": "sidebarCollapsed",
+              "label": "Sidebar Collapsed by Default",
+              "type": "checkbox",
+              "value": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "admin",
+      "label": "Admin Panel",
+      "icon": "shield",
+      "sections": [
+        {
+          "title": "Security & Access",
+          "fields": [
+            {
+              "name": "sessionTimeout",
+              "label": "Session Timeout (minutes)",
+              "type": "number",
+              "value": 60
+            },
+            {
+              "name": "twoFactorAuth",
+              "label": "Enable Two-Factor Authentication",
+              "type": "checkbox",
+              "value": false
+            },
+            {
+              "name": "ipWhitelist",
+              "label": "IP Whitelist (comma separated)",
+              "type": "text",
+              "value": ""
+            }
+          ]
+        },
+        {
+          "title": "Notifications",
+          "fields": [
+            {
+              "name": "emailNotifications",
+              "label": "Email Notifications",
+              "type": "checkbox",
+              "value": true
+            },
+            {
+              "name": "browserNotifications",
+              "label": "Browser Notifications",
+              "type": "checkbox",
+              "value": false
+            },
+            {
+              "name": "slackWebhook",
+              "label": "Slack Webhook URL",
+              "type": "url",
+              "value": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "localization",
+      "label": "Localization",
+      "icon": "globe",
+      "sections": [
+        {
+          "title": "Regional Settings",
+          "fields": [
+            {
+              "name": "language",
+              "label": "Language",
+              "type": "select",
+              "value": "en",
+              "options": [
+                {
+                  "label": "English",
+                  "value": "en"
+                },
+                {
+                  "label": "French",
+                  "value": "fr"
+                },
+                {
+                  "label": "Arabic",
+                  "value": "ar"
+                }
+              ]
+            },
+            {
+              "name": "direction",
+              "label": "Text Direction",
+              "type": "select",
+              "value": "ltr",
+              "options": [
+                {
+                  "label": "Left-to-Right (LTR)",
+                  "value": "ltr"
+                },
+                {
+                  "label": "Right-to-Left (RTL)",
+                  "value": "rtl"
+                }
+              ]
+            },
+            {
+              "name": "timezone",
+              "label": "Timezone",
+              "type": "select",
+              "value": "UTC",
+              "options": [
+                {
+                  "label": "UTC",
+                  "value": "UTC"
+                },
+                {
+                  "label": "EST (New York)",
+                  "value": "EST"
+                },
+                {
+                  "label": "PST (Los Angeles)",
+                  "value": "PST"
+                },
+                {
+                  "label": "GMT (London)",
+                  "value": "GMT"
+                },
+                {
+                  "label": "IST (India)",
+                  "value": "IST"
+                }
+              ]
+            },
+            {
+              "name": "currency",
+              "label": "Currency",
+              "type": "select",
+              "value": "USD",
+              "options": [
+                {
+                  "label": "USD ($)",
+                  "value": "USD"
+                },
+                {
+                  "label": "EUR (€)",
+                  "value": "EUR"
+                },
+                {
+                  "label": "GBP (£)",
+                  "value": "GBP"
+                },
+                {
+                  "label": "INR (₹)",
+                  "value": "INR"
+                }
+              ]
+            },
+            {
+              "name": "dateFormat",
+              "label": "Date Format",
+              "type": "select",
+              "value": "MM/DD/YYYY",
+              "options": [
+                {
+                  "label": "MM/DD/YYYY",
+                  "value": "MM/DD/YYYY"
+                },
+                {
+                  "label": "DD/MM/YYYY",
+                  "value": "DD/MM/YYYY"
+                },
+                {
+                  "label": "YYYY-MM-DD",
+                  "value": "YYYY-MM-DD"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "media",
+      "label": "Media",
+      "icon": "image",
+      "sections": [
+        {
+          "title": "Library Settings",
+          "fields": [
+            {
+              "name": "mediaInfiniteScroll",
+              "label": "Enable Infinite Scroll (Modal)",
+              "type": "checkbox",
+              "value": true
+            },
+            {
+              "name": "mediaItemsPerPage",
+              "label": "Items Per Page",
+              "type": "number",
+              "value": 12
+            }
+          ]
+        },
+        {
+          "title": "Branding Logos",
+          "fields": [
+            {
+              "name": "sidebarLogoBig",
+              "label": "Sidebar Logo (Expanded)",
+              "type": "media",
+              "value": "https://picsum.photos/seed/logo-big/400/100"
+            },
+            {
+              "name": "sidebarLogoCollapsed",
+              "label": "Sidebar Logo (Collapsed)",
+              "type": "media",
+              "value": "https://picsum.photos/seed/logo-small/100/100"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

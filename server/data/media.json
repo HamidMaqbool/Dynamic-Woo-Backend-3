@@ -1,0 +1,372 @@
+[
+    {
+        "id": "media-1",
+        "url": "https://picsum.photos/seed/media1/800/600",
+        "thumbnail": "https://picsum.photos/seed/media1/200/200",
+        "name": "Nature Landscape.jpg",
+        "type": "image/jpeg",
+        "size": 102400,
+        "dimensions": "800x600",
+        "created_at": "2024-03-20T10:00:00Z"
+    },
+    {
+        "id": "media-2",
+        "url": "https://picsum.photos/seed/media2/800/600",
+        "thumbnail": "https://picsum.photos/seed/media2/200/200",
+        "name": "Urban City.jpg",
+        "type": "image/jpeg",
+        "size": 204800,
+        "dimensions": "800x600",
+        "created_at": "2024-03-20T11:00:00Z"
+    },
+    {
+        "id": "media-3",
+        "url": "https://picsum.photos/seed/media3/800/600",
+        "thumbnail": "https://picsum.photos/seed/media3/200/200",
+        "name": "Mountain View.jpg",
+        "type": "image/jpeg",
+        "size": 153600,
+        "dimensions": "800x600",
+        "created_at": "2024-03-20T12:00:00Z"
+    },
+    {
+        "id": "media-4",
+        "url": "https://picsum.photos/seed/media4/800/600",
+        "thumbnail": "https://picsum.photos/seed/media4/200/200",
+        "name": "Forest Path.jpg",
+        "type": "image/jpeg",
+        "size": 122400,
+        "dimensions": "800x600",
+        "created_at": "2024-03-21T09:00:00Z"
+    },
+    {
+        "id": "media-5",
+        "url": "https://picsum.photos/seed/media5/800/600",
+        "thumbnail": "https://picsum.photos/seed/media5/200/200",
+        "name": "Ocean Waves.jpg",
+        "type": "image/jpeg",
+        "size": 184800,
+        "dimensions": "800x600",
+        "created_at": "2024-03-21T10:00:00Z"
+    },
+    {
+        "id": "media-6",
+        "url": "https://picsum.photos/seed/media6/800/600",
+        "thumbnail": "https://picsum.photos/seed/media6/200/200",
+        "name": "Desert Sunset.jpg",
+        "type": "image/jpeg",
+        "size": 143600,
+        "dimensions": "800x600",
+        "created_at": "2024-03-21T11:00:00Z"
+    },
+    {
+        "id": "media-7",
+        "url": "https://picsum.photos/seed/media7/800/600",
+        "thumbnail": "https://picsum.photos/seed/media7/200/200",
+        "name": "Snowy Peaks.jpg",
+        "type": "image/jpeg",
+        "size": 112400,
+        "dimensions": "800x600",
+        "created_at": "2024-03-22T08:00:00Z"
+    },
+    {
+        "id": "media-8",
+        "url": "https://picsum.photos/seed/media8/800/600",
+        "thumbnail": "https://picsum.photos/seed/media8/200/200",
+        "name": "Autumn Leaves.jpg",
+        "type": "image/jpeg",
+        "size": 194800,
+        "dimensions": "800x600",
+        "created_at": "2024-03-22T09:00:00Z"
+    },
+    {
+        "id": "media-9",
+        "url": "https://picsum.photos/seed/media9/800/600",
+        "thumbnail": "https://picsum.photos/seed/media9/200/200",
+        "name": "River Stream.jpg",
+        "type": "image/jpeg",
+        "size": 133600,
+        "dimensions": "800x600",
+        "created_at": "2024-03-22T10:00:00Z"
+    },
+    {
+        "id": "media-10",
+        "url": "https://picsum.photos/seed/media10/800/600",
+        "thumbnail": "https://picsum.photos/seed/media10/200/200",
+        "name": "Starry Night.jpg",
+        "type": "image/jpeg",
+        "size": 252400,
+        "dimensions": "800x600",
+        "created_at": "2024-03-23T22:00:00Z"
+    },
+    {
+        "id": "media-11",
+        "url": "https://picsum.photos/seed/media11/800/600",
+        "thumbnail": "https://picsum.photos/seed/media11/200/200",
+        "name": "Morning Mist.jpg",
+        "type": "image/jpeg",
+        "size": 164800,
+        "dimensions": "800x600",
+        "created_at": "2024-03-24T06:00:00Z"
+    },
+    {
+        "id": "media-12",
+        "url": "https://picsum.photos/seed/media12/800/600",
+        "thumbnail": "https://picsum.photos/seed/media12/200/200",
+        "name": "Flower Garden.jpg",
+        "type": "image/jpeg",
+        "size": 173600,
+        "dimensions": "800x600",
+        "created_at": "2024-03-24T07:00:00Z"
+    },
+    {
+        "id": "media-13",
+        "url": "https://picsum.photos/seed/media13/800/600",
+        "thumbnail": "https://picsum.photos/seed/media13/200/200",
+        "name": "Tropical Beach.jpg",
+        "type": "image/jpeg",
+        "size": 142400,
+        "dimensions": "800x600",
+        "created_at": "2024-03-25T11:00:00Z"
+    },
+    {
+        "id": "media-14",
+        "url": "https://picsum.photos/seed/media14/800/600",
+        "thumbnail": "https://picsum.photos/seed/media14/200/200",
+        "name": "Canyon Walls.jpg",
+        "type": "image/jpeg",
+        "size": 214800,
+        "dimensions": "800x600",
+        "created_at": "2024-03-25T12:00:00Z"
+    },
+    {
+        "id": "media-15",
+        "url": "https://picsum.photos/seed/media15/800/600",
+        "thumbnail": "https://picsum.photos/seed/media15/200/200",
+        "name": "Lighthouse.jpg",
+        "type": "image/jpeg",
+        "size": 123600,
+        "dimensions": "800x600",
+        "created_at": "2024-03-25T13:00:00Z"
+    },
+    {
+        "id": "media-16",
+        "url": "https://picsum.photos/seed/media16/800/600",
+        "thumbnail": "https://picsum.photos/seed/media16/200/200",
+        "name": "Rainforest.jpg",
+        "type": "image/jpeg",
+        "size": 232400,
+        "dimensions": "800x600",
+        "created_at": "2024-03-26T10:00:00Z"
+    },
+    {
+        "id": "media-17",
+        "url": "https://picsum.photos/seed/media17/800/600",
+        "thumbnail": "https://picsum.photos/seed/media17/200/200",
+        "name": "City Skyline.jpg",
+        "type": "image/jpeg",
+        "size": 184800,
+        "dimensions": "800x600",
+        "created_at": "2024-03-26T11:00:00Z"
+    },
+    {
+        "id": "media-18",
+        "url": "https://picsum.photos/seed/media18/800/600",
+        "thumbnail": "https://picsum.photos/seed/media18/200/200",
+        "name": "Wheat Field.jpg",
+        "type": "image/jpeg",
+        "size": 153600,
+        "dimensions": "800x600",
+        "created_at": "2024-03-26T12:00:00Z"
+    },
+    {
+        "id": "media-19",
+        "url": "https://picsum.photos/seed/media19/800/600",
+        "thumbnail": "https://picsum.photos/seed/media19/200/200",
+        "name": "Old Bridge.jpg",
+        "type": "image/jpeg",
+        "size": 112400,
+        "dimensions": "800x600",
+        "created_at": "2024-03-27T09:00:00Z"
+    },
+    {
+        "id": "media-20",
+        "url": "https://picsum.photos/seed/media20/800/600",
+        "thumbnail": "https://picsum.photos/seed/media20/200/200",
+        "name": "Quiet Lake.jpg",
+        "type": "image/jpeg",
+        "size": 194800,
+        "dimensions": "800x600",
+        "created_at": "2024-03-27T10:00:00Z"
+    },
+    {
+        "id": "media-21",
+        "url": "https://picsum.photos/seed/media21/800/600",
+        "thumbnail": "https://picsum.photos/seed/media21/200/200",
+        "name": "Stone Wall.jpg",
+        "type": "image/jpeg",
+        "size": 133600,
+        "dimensions": "800x600",
+        "created_at": "2024-03-27T11:00:00Z"
+    },
+    {
+        "id": "media-22",
+        "url": "https://picsum.photos/seed/media22/800/600",
+        "thumbnail": "https://picsum.photos/seed/media22/200/200",
+        "name": "Vintage Car.jpg",
+        "type": "image/jpeg",
+        "size": 252400,
+        "dimensions": "800x600",
+        "created_at": "2024-03-28T14:00:00Z"
+    },
+    {
+        "id": "media-23",
+        "url": "https://picsum.photos/seed/media23/800/600",
+        "thumbnail": "https://picsum.photos/seed/media23/200/200",
+        "name": "Coffee Cup.jpg",
+        "type": "image/jpeg",
+        "size": 164800,
+        "dimensions": "800x600",
+        "created_at": "2024-03-28T15:00:00Z"
+    },
+    {
+        "id": "media-24",
+        "url": "https://picsum.photos/seed/media24/800/600",
+        "thumbnail": "https://picsum.photos/seed/media24/200/200",
+        "name": "Library Books.jpg",
+        "type": "image/jpeg",
+        "size": 173600,
+        "dimensions": "800x600",
+        "created_at": "2024-03-28T16:00:00Z"
+    },
+    {
+        "id": "media-25",
+        "url": "https://picsum.photos/seed/media25/800/600",
+        "thumbnail": "https://picsum.photos/seed/media25/200/200",
+        "name": "Modern Architecture.jpg",
+        "type": "image/jpeg",
+        "size": 142400,
+        "dimensions": "800x600",
+        "created_at": "2024-03-29T10:00:00Z"
+    },
+    {
+        "id": "media-26",
+        "url": "https://picsum.photos/seed/media26/800/600",
+        "thumbnail": "https://picsum.photos/seed/media26/200/200",
+        "name": "Mountain Stream.jpg",
+        "type": "image/jpeg",
+        "size": 152400,
+        "dimensions": "800x600",
+        "created_at": "2024-03-29T11:00:00Z"
+    },
+    {
+        "id": "media-27",
+        "url": "https://picsum.photos/seed/media27/800/600",
+        "thumbnail": "https://picsum.photos/seed/media27/200/200",
+        "name": "Desert Dunes.jpg",
+        "type": "image/jpeg",
+        "size": 162400,
+        "dimensions": "800x600",
+        "created_at": "2024-03-29T12:00:00Z"
+    },
+    {
+        "id": "media-28",
+        "url": "https://picsum.photos/seed/media28/800/600",
+        "thumbnail": "https://picsum.photos/seed/media28/200/200",
+        "name": "Snowy Forest.jpg",
+        "type": "image/jpeg",
+        "size": 172400,
+        "dimensions": "800x600",
+        "created_at": "2024-03-30T09:00:00Z"
+    },
+    {
+        "id": "media-29",
+        "url": "https://picsum.photos/seed/media29/800/600",
+        "thumbnail": "https://picsum.photos/seed/media29/200/200",
+        "name": "City Park.jpg",
+        "type": "image/jpeg",
+        "size": 182400,
+        "dimensions": "800x600",
+        "created_at": "2024-03-30T10:00:00Z"
+    },
+    {
+        "id": "media-30",
+        "url": "https://picsum.photos/seed/media30/800/600",
+        "thumbnail": "https://picsum.photos/seed/media30/200/200",
+        "name": "Beach Sunset.jpg",
+        "type": "image/jpeg",
+        "size": 192400,
+        "dimensions": "800x600",
+        "created_at": "2024-03-30T11:00:00Z"
+    },
+    {
+        "id": "media-31",
+        "url": "https://picsum.photos/seed/media31/800/600",
+        "thumbnail": "https://picsum.photos/seed/media31/200/200",
+        "name": "Old Town.jpg",
+        "type": "image/jpeg",
+        "size": 202400,
+        "dimensions": "800x600",
+        "created_at": "2024-03-31T08:00:00Z"
+    },
+    {
+        "id": "media-32",
+        "url": "https://picsum.photos/seed/media32/800/600",
+        "thumbnail": "https://picsum.photos/seed/media32/200/200",
+        "name": "Green Valley.jpg",
+        "type": "image/jpeg",
+        "size": 212400,
+        "dimensions": "800x600",
+        "created_at": "2024-03-31T09:00:00Z"
+    },
+    {
+        "id": "media-33",
+        "url": "https://picsum.photos/seed/media33/800/600",
+        "thumbnail": "https://picsum.photos/seed/media33/200/200",
+        "name": "Rocky Shore.jpg",
+        "type": "image/jpeg",
+        "size": 222400,
+        "dimensions": "800x600",
+        "created_at": "2024-03-31T10:00:00Z"
+    },
+    {
+        "id": "media-34",
+        "url": "https://picsum.photos/seed/media34/800/600",
+        "thumbnail": "https://picsum.photos/seed/media34/200/200",
+        "name": "Night Sky.jpg",
+        "type": "image/jpeg",
+        "size": 232400,
+        "dimensions": "800x600",
+        "created_at": "2024-04-01T22:00:00Z"
+    },
+    {
+        "id": "media-35",
+        "url": "https://picsum.photos/seed/media35/800/600",
+        "thumbnail": "https://picsum.photos/seed/media35/200/200",
+        "name": "Spring Bloom.jpg",
+        "type": "image/jpeg",
+        "size": 242400,
+        "dimensions": "800x600",
+        "created_at": "2024-04-02T06:00:00Z"
+    },
+    {
+        "id": "media-logo-big",
+        "url": "https://picsum.photos/seed/logo-big/400/100",
+        "thumbnail": "https://picsum.photos/seed/logo-big/200/50",
+        "name": "Sidebar Logo Expanded.png",
+        "type": "image/png",
+        "size": 45000,
+        "dimensions": "400x100",
+        "created_at": "2024-04-03T10:00:00Z"
+    },
+    {
+        "id": "media-logo-small",
+        "url": "https://picsum.photos/seed/logo-small/100/100",
+        "thumbnail": "https://picsum.photos/seed/logo-small/100/100",
+        "name": "Sidebar Logo Collapsed.png",
+        "type": "image/png",
+        "size": 15000,
+        "dimensions": "100x100",
+        "created_at": "2024-04-03T10:05:00Z"
+    }
+]

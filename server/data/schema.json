@@ -1,0 +1,131 @@
+{
+    "database": "CarpartsSchema",
+    "table": {
+        "auroparts-product": {
+            "dropdown": [
+                { "label": "Delete All", "action": "delete-all" },
+                { "label": "Published Products", "action": "published-products" },
+                { "label": "Draft Products", "action": "draft-products" }
+            ],
+            "label": { "singular": "Product", "pulular": "Products" },
+            "tabs": [
+                { "label": "Products", "route": "posts.index", "var": ["type"] },
+                { "label": "Variations($variation_count)", "route": "posts.variations", "var": ["type", "parent_id$parent_id"] },
+                { "label": "Edit Products", "route": "post.form", "var": ["type", "id"] }
+            ],
+            "table": {
+                "type": "main",
+                "updateMode": "manual",
+                "paginationPerPage": 10,
+                "paginationList": [10, 20, 50, 100],
+                "cols": [
+                    { "name": "ID", "sortable": true, "col": "id", "searchable": true, "width": "80px" },
+                    { "name": "Image", "sortable": false, "col": "image", "type": "image", "width": "80px" },
+                    { "name": "Type", "sortable": true, "col": "product_type", "type": "badge", "width": "100px" },
+                    { "name": "AuropartsID", "sortable": true, "searchable": true, "col": "identifier", "width": "150px" },
+                    { "name": "Parent", "sortable": true, "searchable": true, "col": "parent_id", "width": "120px" },
+                    { "name": "Title", "sortable": true, "searchable": true, "col": "title", "columnType": "text", "autoUpdate": true, "width": "300px" },
+                    { "name": "Status", "sortable": true, "col": "status", "width": "150px", "columnType": "select" },
+                    { "name": "Created Date", "sortable": true, "col": "created_at", "width": "150px" },
+                    { "name": "Action", "sortable": true, "col": ["edit", "delete"], "type": "action", "width": "150px" }
+                ]
+            }
+        }
+    },
+    "form": {
+        "auroparts-product": [
+            {
+                "title": "Featured Image",
+                "type": "sidebar",
+                "name": "save",
+                "fields": [
+                    {
+                        "title": "Status",
+                        "name": "status",
+                        "value": "new",
+                        "options": [
+                            { "value": "publish", "label": "Published" },
+                            { "value": "draft", "label": "Draft" },
+                            { "value": "deleted", "label": "Deleted" }
+                        ],
+                        "placeholder": "New",
+                        "type": "status",
+                        "field-type":"main",
+                        "dbcol":"status"
+                    },
+                    {
+                        "title": "",
+                        "name": "image",
+                        "value": "",
+                        "type": "image",
+                        "field-type":"main",
+                        "dbcol":"image",
+                        "style": "full",
+                        "attr": { "readOnly": "true" },
+                        "valid": ""
+                    },
+                    { "name": "save", "type": "save", "value": "save" }
+                ]
+            },
+            {
+                "title": "Product Details",
+                "name": "content-en",
+                "fields": [
+                    { "title": "Product Name", "name": "item_name", "value": "test", "type": "text", "placeholder": "", "tooltip": "", "valid": "required", "field-type":"main", "dbcol":"title" },
+                    { "title": "Company Name", "name": "company_name", "class": "half", "value": "", "type": "text", "readOnly": true, "placeholder": "", "tooltip": "", "valid": "required" },
+                    { "title": "Year", "name": "year", "value": "", "type": "text", "readOnly": true, "class": "half", "placeholder": "", "tooltip": "", "valid": "required" },
+                    { "title": "Odo Reading", "name": "odo_reading", "value": "", "type": "text", "attr": { "readOnly": "true" }, "class": "half", "placeholder": "", "tooltip": "", "valid": "required" },
+                    { "title": "Stock status", "name": "stock_status", "value": "", "type": "text", "attr": { "readOnly": "true" }, "class": "half", "placeholder": "", "tooltip": "", "valid": "required" },
+                    { "title": "Price", "name": "price", "value": "", "type": "text", "attr": { "readOnly": "true" }, "class": "half", "placeholder": "", "tooltip": "", "valid": "required" },
+                    { "title": "Email", "name": "email", "value": "", "type": "text", "attr": { "readOnly": "true" }, "class": "half", "placeholder": "", "tooltip": "", "valid": "required" },
+                    { "title": "Model", "name": "model", "value": "", "type": "text", "attr": { "readOnly": "true" }, "class": "half", "placeholder": "", "tooltip": "", "valid": "required" },
+                    { "title": "Comments", "name": "comments", "value": "", "type": "text", "attr": { "readOnly": "true" }, "class": "full", "placeholder": "", "tooltip": "", "valid": "required" }
+                ]
+            },
+            {
+                "title": "Media",
+                "name": "media",
+                "fields": [
+                    { "title": "Select and Upload", "name": "images", "value": [], "type": "images", "max": 5, "placeholder": "", "tooltip": "(Minimum size 1440x900)" }
+                ]
+            },
+            {
+                "title": "Specifications",
+                "name": "specs",
+                "fields": [
+                    {
+                        "title": "Technical Specs",
+                        "name": "technical_specs",
+                        "type": "repeater",
+                        "class": "full",
+                        "fields": [
+                            { "title": "Label", "name": "label", "type": "text", "class": "half" },
+                            { "title": "Value", "name": "value", "type": "text", "class": "half" }
+                        ]
+                    }
+                ]
+            },
+            {
+                "title": "Variations",
+                "name": "variations_section",
+                "fields": [
+                    {
+                        "title": "Product Variations",
+                        "name": "variations",
+                        "type": "variation",
+                        "class": "full",
+                        "columns": [
+                            { "name": "isDefault", "label": "Default", "type": "radio", "width": "80px" },
+                            { "name": "image", "label": "Image", "type": "image", "width": "80px" },
+                            { "name": "combination", "label": "Variant", "type": "text", "readOnly": true },
+                            { "name": "price", "label": "Price", "type": "number", "prefix": "$" },
+                            { "name": "sku", "label": "SKU", "type": "text" },
+                            { "name": "inventory", "label": "Inventory", "type": "number" },
+                            { "name": "comment", "label": "Comment", "type": "text" }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

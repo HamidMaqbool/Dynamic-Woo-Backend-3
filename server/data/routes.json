@@ -1,0 +1,32 @@
+[
+  {
+    "path": "/",
+    "view": "dashboard",
+    "title": "Dashboard",
+    "icon": "layout-dashboard"
+  },
+  {
+    "path": "/products",
+    "view": "list",
+    "title": "Products",
+    "icon": "package"
+  },
+  {
+    "path": "/usage",
+    "view": "usage",
+    "title": "Usage Guide",
+    "icon": "help-circle"
+  },
+  {
+    "path": "/settings",
+    "view": "settings",
+    "title": "Settings",
+    "icon": "settings"
+  },
+  {
+    "path": "/media",
+    "view": "media",
+    "title": "Media",
+    "icon": "image"
+  }
+]

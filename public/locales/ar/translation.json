@@ -1,0 +1,212 @@
+{
+  "common": {
+    "dashboard": "لوحة القيادة",
+    "products": "المنتجات",
+    "media": "الوسائط",
+    "settings": "الإعدادات",
+    "logout": "تسجيل الخروج",
+    "search": "بحث...",
+    "notifications": "التنبيهات",
+    "profile": "الملف الشخصي",
+    "save": "حفظ التغييرات",
+    "cancel": "إلغاء",
+    "reset": "إعادة تعيين",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "add": "إضافة جديد",
+    "export": "تصدير",
+    "columns": "أعمدة",
+    "available_columns": "الأعمدة المتاحة",
+    "loading": "جاري التحميل...",
+    "no_data": "لم يتم العثور على بيانات",
+    "day": "يوم",
+    "viewAll": "عرض الكل"
+  },
+  "dashboard": {
+    "welcome": "مرحباً بك مرة أخرى",
+    "total_sales": "إجمالي المبيعات",
+    "total_orders": "إجمالي الطلبات",
+    "total_customers": "إجمالي العملاء",
+    "active_products": "المنتجات النشطة",
+    "recent_orders": "الطلبات الأخيرة",
+    "sales_overview": "نظرة عامة على المبيعات",
+    "description": "نظرة عامة على أداء عملك والأنشطة الأخيرة.",
+    "last_7_days": "آخر 7 أيام",
+    "last_30_days": "آخر 30 يومًا"
+  },
+  "products": {
+    "title": "إدارة المنتجات",
+    "add_product": "إضافة منتج",
+    "edit_product": "تعديل المنتج",
+    "product_name": "اسم المنتج",
+    "sku": "SKU",
+    "price": "السعر",
+    "inventory": "المخزون",
+    "status": "الحالة",
+    "actions": "الإجراءات",
+    "manageDescription": "إدارة ومراقبة مخزون المنتجات الخاص بك"
+  },
+  "settings": {
+    "title": "إعدادات النظام",
+    "description": "إدارة تكوين التطبيق وتفضيلاتك.",
+    "general": "عام",
+    "appearance": "المظهر",
+    "admin": "لوحة الإدارة",
+    "localization": "التوطين",
+    "media": "الوسائط",
+    "language": "اللغة",
+    "direction": "الاتجاه",
+    "site_name": "اسم الموقع",
+    "site_description": "وصف الموقع",
+    "change_image": "تغيير الصورة",
+    "select_image": "تحديد صورة",
+    "remove_image": "إزالة الصورة",
+    "no_image": "لم يتم اختيار صورة",
+    "save": "حفظ التغييرات",
+    "saving": "جاري الحفظ..."
+  },
+  "media": {
+    "title": "مكتبة الوسائط",
+    "subtitle": "إدارة وتنظيم أصول الوسائط الخاصة بك",
+    "upload": "رفع",
+    "library": "المكتبة",
+    "images": "صور",
+    "featured": "مميز",
+    "addMedia": "إضافة وسائط",
+    "noMediaUploaded": "لم يتم رفع وسائط بعد",
+    "clickToSelect": "انقر لاختيار ملفات من مكتبة الوسائط",
+    "dropFiles": "أفلت الملفات للرفع",
+    "browseFiles": "أو انقر للتصفح من جهاز الكمبيوتر الخاص بك",
+    "searchPlaceholder": "بحث في الوسائط...",
+    "itemsCount": "{{count}} عناصر",
+    "noMediaFound": "لم يتم العثور على وسائط",
+    "tryDifferentSearch": "جرب بحثًا مختلفًا أو ارفع ملفات جديدة",
+    "loadMore": "تحميل المزيد",
+    "details": "تفاصيل الوسائط",
+    "fileName": "اسم الملف",
+    "type": "النوع",
+    "size": "الحجم",
+    "created": "تاريخ الإنشاء",
+    "dimensions": "الأبعاد",
+    "deleteFile": "حذف الملف",
+    "viewFull": "عرض كامل",
+    "selectItem": "حدد عنصرًا لعرض التفاصيل",
+    "cancel": "إلغاء",
+    "select": "تحديد",
+    "preview": "معاينة",
+    "actions": "إجراءات",
+    "selectedCount": "تم تحديد {{count}} عنصر",
+    "selectedCount_plural": "تم تحديد {{count}} عناصر",
+    "deleteConfirm": "هل أنت متأكد أنك تريد حذف هذه الوسائط؟",
+    "dateFilters": {
+      "all": "جميع التواريخ",
+      "today": "اليوم",
+      "thisMonth": "هذا الشهر",
+      "thisYear": "هذه السنة"
+    }
+  },
+  "usage": {
+    "title": "دليل استخدام المدخلات",
+    "subtitle": "نظرة عامة شاملة على جميع مدخلات النماذج الديناميكية المحددة في المخطط.",
+    "availableTypes": "أنواع الحقول المتاحة",
+    "datatableComponents": "مكونات جدول البيانات",
+    "totalFields": "إجمالي الحقول",
+    "sections": "الأقسام",
+    "uniqueTypes": "الأنواع الفريدة",
+    "fieldTitle": "عنوان الحقل",
+    "type": "النوع",
+    "section": "القسم",
+    "validation": "التحقق",
+    "config": "التكوين",
+    "required": "مطلوب",
+    "optional": "اختياري",
+    "rawSchema": "تعريف المخطط الخام",
+    "jsonFormat": "تنسيق JSON",
+    "supportedOptions": "الخيارات المدعومة",
+    "keyFeatures": "الميزات الرئيسية",
+    "options": {
+      "placeholder": "نص تلميحي",
+      "required": "صالح (مطلوب)",
+      "tooltip": "تلميح",
+      "readOnly": "للقراءة فقط",
+      "prefix": "بادئة",
+      "suffix": "لاحقة",
+      "options_label_value": "خيارات (أزواج التسمية/القيمة)",
+      "rows": "صفوف",
+      "max_default_10": "الحد الأقصى (الافتراضي 10)",
+      "fields_nested": "حقول (تعريفات الحقول المتداخلة)",
+      "columns_table": "أعمدة (تعريف الجدول)"
+    },
+    "datatableDocs": {
+      "main": {
+        "description": "مكون الجدول الأساسي الذي يعرض الصفوف والأعمدة بناءً على المخطط."
+      },
+      "DataTable": {
+        "title": "جدول البيانات"
+      },
+      "columnTypes": {
+        "title": "أنواع الأعمدة",
+        "description": "عارضات خلايا متخصصة لأنواع البيانات المختلفة."
+      },
+      "TableFilters": {
+        "title": "مرشحات الجدول",
+        "description": "عناصر التحكم في البحث والتصفية لجدول البيانات."
+      },
+      "filters": {
+        "description": "عناصر التحكم في البحث والتصفية لجدول البيانات."
+      }
+    },
+    "features": {
+      "sorting": "فرز",
+      "filtering": "تصفية",
+      "pagination": "ترقيم الصفحات",
+      "bulkActions": "إجراءات جماعية",
+      "searchQuery": "استعلام البحث",
+      "statusFilter": "مرشح الحالة",
+      "parentIdFilter": "مرشح المعرف الأب"
+    },
+    "types": {
+      "badge": "شارة",
+      "status": "حالة",
+      "image": "صورة",
+      "text": "نص",
+      "select": "اختيار",
+      "action": "إجراء",
+      "manualUpdate": "تحديث يدوي"
+    },
+    "fieldDocs": {
+      "text": "إدخال نص قياسي لسطر واحد للأسماء والعناوين والأوصاف القصيرة.",
+      "number": "حقل إدخال رقمي للأسعار والكميات والقياسات.",
+      "select": "قائمة منسدلة لاختيار قيمة واحدة من قائمة محددة مسبقًا.",
+      "textarea": "منطقة نصية متعددة الأسطر للأوصاف الطويلة والملاحظات.",
+      "checkbox": "مفتاح تبديل أو مربع اختيار للقيم المنطقية (صح/خطأ).",
+      "image": "حقل تحميل صورة واحدة مع إمكانية المعاينة والإزالة.",
+      "gallery": "تحميل صور متعددة بأسلوب Shopify مع فرز بالسحب والإفلات واختيار الصورة المميزة.",
+      "color": "منتقي الألوان لاختيار رموز hex مع معاينة بصرية.",
+      "repeater": "قائمة ديناميكية من الحقول التي يمكن إضافتها وإزالتها وإعادة ترتيبها.",
+      "variation": "حقل معقد لإدارة تنوعات المنتجات والأسعار والمخزون."
+    }
+  },
+  "datatable": {
+    "search": "بحث...",
+    "filterByStatus": "تصفية حسب الحالة",
+    "allStatuses": "جميع الحالات",
+    "filterByParent": "تصفية حسب الأصل",
+    "allParents": "جميع الأصول",
+    "itemsSelected": "{{count}} عناصر مختارة",
+    "deleteSelected": "حذف المختار",
+    "noItemsFound": "لم يتم العثور على عناصر",
+    "rowsPerPage": "عدد الصفوف في الصفحة",
+    "showing": "عرض {{start}} إلى {{end}} من أصل {{total}} نتائج",
+    "addRow": "إضافة صف",
+    "enterField": "أدخل {{field}}..."
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "signIn": "تسجيل الدخول",
+    "signingIn": "جاري تسجيل الدخول...",
+    "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صالحة"
+  }
+}

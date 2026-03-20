@@ -1,0 +1,60 @@
+[
+  {
+    "title": "Dashboard",
+    "icon": "layout",
+    "path": "dashboard"
+  },
+  {
+    "title": "Products",
+    "icon": "package",
+    "path": "my-products",
+    "children": [
+      {
+        "title": "All Products",
+        "path": "products"
+      },
+       {
+        "title": "Hello",
+        "path": "hello/all"
+      },
+      {
+        "title": "Add New",
+        "path": "my-products/add"
+      },
+      {
+        "title": "Categories",
+        "path": "my-products"
+      }
+    ]
+  },
+  {
+    "title": "Customers",
+    "icon": "users",
+    "path": "customers",
+    "children": [
+      {
+        "title": "All Customers",
+        "path": "customers/all"
+      },
+      {
+        "title": "Segments",
+        "path": "customers/segments"
+      }
+    ]
+  },
+  {
+    "title": "Media",
+    "icon": "image",
+    "path": "media"
+  },
+  {
+    "title": "Settings",
+    "icon": "settings",
+    "path": "settings"
+  },
+  {
+    "title": "Usage Guide",
+    "icon": "info",
+    "path": "usage"
+  }
+]
