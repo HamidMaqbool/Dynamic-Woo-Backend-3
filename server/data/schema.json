@@ -30,6 +30,43 @@
                     { "name": "Action", "sortable": true, "col": ["edit", "delete"], "type": "action", "width": "150px", "responsive": "expandable" }
                 ]
             }
+        },
+        "media": {
+            "label": { "singular": "Media", "plural": "Media" },
+            "table": {
+                "cols": [
+                    { "name": "ID", "col": "id" },
+                    { "name": "Name", "col": "name" },
+                    { "name": "URL", "col": "url" },
+                    { "name": "Thumbnail", "col": "thumbnail" },
+                    { "name": "Type", "col": "type" },
+                    { "name": "Size", "col": "size", "type": "number" },
+                    { "name": "Dimensions", "col": "dimensions" },
+                    { "name": "Created At", "col": "created_at", "type": "date" }
+                ]
+            }
+        },
+        "settings": {
+            "label": { "singular": "Setting", "plural": "Settings" },
+            "table": {
+                "cols": [
+                    { "name": "Key", "col": "key", "unique": true, "required": true },
+                    { "name": "Value", "col": "value", "type": "json" }
+                ]
+            }
+        },
+        "users": {
+            "label": { "singular": "User", "plural": "Users" },
+            "table": {
+                "cols": [
+                    { "name": "ID", "col": "id", "required": true },
+                    { "name": "Name", "col": "name", "required": true, "searchable": true },
+                    { "name": "Email", "col": "email", "unique": true, "required": true, "searchable": true },
+                    { "name": "Password", "col": "password", "required": true },
+                    { "name": "Role", "col": "role", "required": true },
+                    { "name": "Created At", "col": "created_at", "type": "date" }
+                ]
+            }
         }
     },
     "form": {
