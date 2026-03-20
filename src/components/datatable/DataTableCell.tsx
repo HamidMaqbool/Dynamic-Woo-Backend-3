@@ -10,19 +10,19 @@ import { useTranslation } from 'react-i18next';
 
 interface DataTableCellProps {
     col: any;
-    product: Product;
+    item: any;
     localValue: any;
     statusOptions: { value: string; label: string }[];
-    onLocalChange: (productId: string, fieldName: string, value: any, autoUpdate?: boolean) => void;
-    onManualUpdate: (productId: string) => void;
-    onDelete: (productId: string) => void;
-    onEdit: (productId: string) => void;
+    onLocalChange: (itemId: string, fieldName: string, value: any, autoUpdate?: boolean) => void;
+    onManualUpdate: (itemId: string) => void;
+    onDelete: (itemId: string) => void;
+    onEdit: (itemId: string) => void;
     hasChanges: boolean;
 }
 
 export const DataTableCell: React.FC<DataTableCellProps> = ({
     col,
-    product,
+    item,
     localValue,
     statusOptions,
     onLocalChange,
@@ -32,9 +32,9 @@ export const DataTableCell: React.FC<DataTableCellProps> = ({
     hasChanges
 }) => {
     const { t } = useTranslation();
-    const productId = product.id;
+    const itemId = item.id;
     const fieldName = col.col as string;
-    const originalValue = product[fieldName as keyof Product];
+    const originalValue = item[fieldName];
     const value = localValue !== undefined ? localValue : originalValue;
 
     const columnType = col.columnType || col.type;
@@ -45,10 +45,10 @@ export const DataTableCell: React.FC<DataTableCellProps> = ({
         return (
             <TextColumn 
                 value={value as string}
-                onChange={(val) => onLocalChange(productId, fieldName, val, false)}
+                onChange={(val) => onLocalChange(itemId, fieldName, val, false)}
                 onBlur={() => {
                     if (col.autoUpdate) {
-                        onLocalChange(productId, fieldName, value, true);
+                        onLocalChange(itemId, fieldName, value, true);
                     }
                 }}
                 placeholder={t('datatable.enterField', { field: col.name })}
@@ -60,7 +60,7 @@ export const DataTableCell: React.FC<DataTableCellProps> = ({
         return (
             <SelectColumn 
                 value={value as string}
-                onChange={(val) => onLocalChange(productId, fieldName, val, col.autoUpdate)}
+                onChange={(val) => onLocalChange(itemId, fieldName, val, col.autoUpdate)}
                 options={statusOptions}
             />
         );
@@ -73,11 +73,11 @@ export const DataTableCell: React.FC<DataTableCellProps> = ({
     if (col.type === 'action') {
         return (
             <RowActions 
-                onEdit={() => onEdit(product.id)}
-                onDelete={() => onDelete(product.id)}
-                onUpdate={() => onManualUpdate(product.id)}
+                onEdit={() => onEdit(item.id)}
+                onDelete={() => onDelete(item.id)}
+                onUpdate={() => onManualUpdate(item.id)}
                 hasChanges={hasChanges}
-                isNew={productId.startsWith('NEW-')}
+                isNew={itemId.startsWith('NEW-')}
             />
         );
     }

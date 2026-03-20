@@ -14,18 +14,22 @@ import { useTranslation } from 'react-i18next';
 
 import { DataTableRow } from './DataTableRow';
 
-export const DataTable: React.FC = () => {
+interface DataTableProps {
+    entity?: string;
+}
+
+export const DataTable: React.FC<DataTableProps> = ({ entity = 'products' }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const { 
-        products, 
+        items, 
         isLoading,
         schema,
         routes,
-        fetchProducts,
+        fetchData,
         currentPage, 
         itemsPerPage, 
-        totalProducts,
+        totalItems,
         totalPages,
         searchQuery, 
         filters,
@@ -33,19 +37,19 @@ export const DataTable: React.FC = () => {
         setItemsPerPage, 
         setSearchQuery,
         setFilters,
-        addProduct,
-        updateProduct,
-        deleteProduct,
-        bulkDeleteProducts,
-        selectedProductIds,
-        setSelectedProductIds
+        addItem,
+        updateItem,
+        deleteItem,
+        bulkDeleteItems,
+        selectedIds,
+        setSelectedIds
     } = useCRMStore();
 
-    const [localChanges, setLocalChanges] = useState<Record<string, Partial<Product>>>({});
-    const [newRows, setNewRows] = useState<Product[]>([]);
+    const [localChanges, setLocalChanges] = useState<Record<string, any>>({});
+    const [newRows, setNewRows] = useState<any[]>([]);
 
-    const listRoute = routes?.find(r => r.view === 'list');
-    const basePath = listRoute?.path || '/products';
+    const listRoute = routes?.find(r => r.path.substring(1) === entity);
+    const basePath = listRoute?.path || `/${entity}`;
 
     const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; id: string | null; isBulk: boolean }>({
         isOpen: false,
@@ -53,15 +57,16 @@ export const DataTable: React.FC = () => {
         isBulk: false
     });
 
-    const tableConfig = schema?.table["auroparts-product"].table;
+    const tableKey = Object.keys(schema?.table || {}).find(key => key.includes(entity)) || "auroparts-product";
+    const tableConfig = schema?.table[tableKey]?.table;
     const initialCols = tableConfig?.cols || [];
     const [visibleColumns, setVisibleColumns] = useState<string[]>(initialCols.map((c: any) => c.name));
 
     useEffect(() => {
-        fetchProducts();
-    }, [fetchProducts]);
+        fetchData(entity);
+    }, [fetchData, entity, currentPage, itemsPerPage, searchQuery, filters]);
 
-    if (!schema) {
+    if (!schema || !tableConfig) {
         return <TableSkeleton />;
     }
 
@@ -77,10 +82,11 @@ export const DataTable: React.FC = () => {
     };
 
     // Get filter options from schema
-    const statusOptions = (schema.form["auroparts-product"][0].fields.find((f: any) => f.name === 'status') as any)?.options || [];
+    const formKey = Object.keys(schema?.form || {}).find(key => key.includes(entity)) || "auroparts-product";
+    const statusOptions = (schema.form[formKey][0].fields.find((f: any) => f.name === 'status') as any)?.options || [];
 
     const handleAddRow = () => {
-        const newRow: Product = {
+        const newRow: any = {
             id: `NEW-${Date.now()}`,
             image: 'https://picsum.photos/seed/new/100/100',
             identifier: `AURO-${Math.floor(Math.random() * 10000)}`,
@@ -97,32 +103,32 @@ export const DataTable: React.FC = () => {
         }));
     };
 
-    const handleLocalChange = (productId: string, field: string, value: any, autoUpdate?: boolean) => {
-        const isNew = productId.startsWith('NEW-');
+    const handleLocalChange = (itemId: string, field: string, value: any, autoUpdate?: boolean) => {
+        const isNew = itemId.startsWith('NEW-');
         
         // Update local state first
         setLocalChanges(prev => ({
             ...prev,
-            [productId]: {
-                ...(prev[productId] || {}),
+            [itemId]: {
+                ...(prev[itemId] || {}),
                 [field]: value
             }
         }));
 
         // If autoUpdate is true or global updateMode is auto, and it's not a new row, trigger the store update
         if ((autoUpdate || updateMode === 'auto') && !isNew) {
-            updateProduct(productId, { [field]: value });
+            updateItem(entity, itemId, { [field]: value });
             
             // If it was an auto-update, we can clear the local change for this specific field
             if (autoUpdate || updateMode === 'auto') {
                 setLocalChanges(prev => {
                     const next = { ...prev };
-                    if (next[productId]) {
-                        const { [field]: _, ...rest } = next[productId];
+                    if (next[itemId]) {
+                        const { [field]: _, ...rest } = next[itemId];
                         if (Object.keys(rest).length === 0) {
-                            delete next[productId];
+                            delete next[itemId];
                         } else {
-                            next[productId] = rest;
+                            next[itemId] = rest;
                         }
                     }
                     return next;
@@ -131,38 +137,38 @@ export const DataTable: React.FC = () => {
         }
     };
 
-    const handleManualUpdate = async (productId: string) => {
-        const changes = localChanges[productId];
+    const handleManualUpdate = async (itemId: string) => {
+        const changes = localChanges[itemId];
         if (changes) {
-            if (productId.startsWith('NEW-')) {
-                const { id, ...productData } = changes as Product;
-                await addProduct(productData as Product);
-                setNewRows(prev => prev.filter(r => r.id !== productId));
+            if (itemId.startsWith('NEW-')) {
+                const { id, ...itemData } = changes;
+                await addItem(entity, itemData);
+                setNewRows(prev => prev.filter(r => r.id !== itemId));
             } else {
-                await updateProduct(productId, changes);
+                await updateItem(entity, itemId, changes);
             }
             
             setLocalChanges(prev => {
                 const next = { ...prev };
-                delete next[productId];
+                delete next[itemId];
                 return next;
             });
         }
     };
 
     const toggleSelectAll = () => {
-        if (selectedProductIds.length === products.length && products.length > 0) {
-            setSelectedProductIds([]);
+        if (selectedIds.length === items.length && items.length > 0) {
+            setSelectedIds([]);
         } else {
-            setSelectedProductIds(products.map(p => p.id));
+            setSelectedIds(items.map(p => p.id));
         }
     };
 
     const toggleSelect = (id: string) => {
-        if (selectedProductIds.includes(id)) {
-            setSelectedProductIds(selectedProductIds.filter(i => i !== id));
+        if (selectedIds.includes(id)) {
+            setSelectedIds(selectedIds.filter(i => i !== id));
         } else {
-            setSelectedProductIds([...selectedProductIds, id]);
+            setSelectedIds([...selectedIds, id]);
         }
     };
 
@@ -185,24 +191,24 @@ export const DataTable: React.FC = () => {
 
     const confirmDelete = () => {
         if (deleteModal.isBulk) {
-            bulkDeleteProducts(selectedProductIds);
+            bulkDeleteItems(entity, selectedIds);
         } else if (deleteModal.id) {
-            deleteProduct(deleteModal.id);
+            deleteItem(entity, deleteModal.id);
         }
     };
 
-    const allRows = [...newRows, ...products];
+    const allRows = [...newRows, ...items];
 
     return (
         <div className="flex flex-col h-full bg-[#F8F9FA] text-[#1A1A1A] font-sans">
             {/* Header Controls */}
             <div className="bg-white border-b border-slate-200 px-4 py-4 sm:px-8 sm:py-6 flex flex-col gap-6">
                 <TableHeader 
-                    title={schema.table["auroparts-product"].label.plural}
-                    description={t('products.manageDescription')}
+                    title={schema.table[tableKey].label.plural}
+                    description={t(`${entity}.manageDescription`)}
                     onAddRow={handleAddRow}
                     onAddProduct={() => navigate(`${basePath}/add`)}
-                    addProductLabel={schema.table["auroparts-product"].label.singular}
+                    addProductLabel={schema.table[tableKey].label.singular}
                 />
 
                 <TableFilters 
@@ -225,7 +231,7 @@ export const DataTable: React.FC = () => {
 
             {/* Bulk Actions Bar */}
             <AnimatePresence>
-                {selectedProductIds.length > 0 && (
+                {selectedIds.length > 0 && (
                     <motion.div 
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -235,9 +241,9 @@ export const DataTable: React.FC = () => {
                         <div className="flex items-center gap-8">
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold">
-                                    {selectedProductIds.length}
+                                    {selectedIds.length}
                                 </div>
-                                <span className="text-sm font-bold uppercase tracking-wider">{t('datatable.itemsSelected', { count: selectedProductIds.length })}</span>
+                                <span className="text-sm font-bold uppercase tracking-wider">{t('datatable.itemsSelected', { count: selectedIds.length })}</span>
                             </div>
                             
                             <div className="h-6 w-px bg-white/20" />
@@ -255,20 +261,13 @@ export const DataTable: React.FC = () => {
                                     className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-bold transition-all border border-white/10"
                                 >
                                     <Icon name="edit" className="w-4 h-4" />
-                                    {t('common.edit')} {t('products.status')}
-                                </button>
-
-                                <button 
-                                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-bold transition-all border border-white/10"
-                                >
-                                    <Icon name="upload" className="w-4 h-4" />
-                                    {t('common.export')}
+                                    {t('common.edit')} {t(`${entity}.status`)}
                                 </button>
                             </div>
                         </div>
                         
                         <button 
-                            onClick={() => setSelectedProductIds([])}
+                            onClick={() => setSelectedIds([])}
                             className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white/10 text-xs font-bold transition-all"
                         >
                             <Icon name="x" className="w-4 h-4" />
@@ -282,7 +281,7 @@ export const DataTable: React.FC = () => {
             <div className="flex-1 overflow-auto p-4 sm:p-8 relative">
                 {/* Loading Overlay */}
                 <AnimatePresence>
-                    {isLoading && products.length > 0 && (
+                    {isLoading && items.length > 0 && (
                         <motion.div 
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -299,10 +298,10 @@ export const DataTable: React.FC = () => {
 
                 <div className={cn(
                     "bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-300",
-                    isLoading && products.length > 0 && "opacity-50 grayscale-[0.5]"
+                    isLoading && items.length > 0 && "opacity-50 grayscale-[0.5]"
                 )}>
                     <div className="overflow-x-auto">
-                        {isLoading && products.length === 0 ? (
+                        {isLoading && items.length === 0 ? (
                             <TableSkeleton />
                         ) : (
                             <table className="w-full border-collapse">
@@ -312,7 +311,7 @@ export const DataTable: React.FC = () => {
                                             <label className="relative flex items-center justify-center cursor-pointer group select-none">
                                                 <input 
                                                     type="checkbox" 
-                                                    checked={selectedProductIds.length === products.length && products.length > 0}
+                                                    checked={selectedIds.length === items.length && items.length > 0}
                                                     onChange={toggleSelectAll}
                                                     className="peer sr-only"
                                                 />
@@ -355,12 +354,12 @@ export const DataTable: React.FC = () => {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
-                                    {allRows.map((product) => (
+                                    {allRows.map((item) => (
                                         <DataTableRow 
-                                            key={product.id}
-                                            product={product}
+                                            key={item.id}
+                                            item={item}
                                             cols={cols}
-                                            selectedProductIds={selectedProductIds}
+                                            selectedIds={selectedIds}
                                             toggleSelect={toggleSelect}
                                             localChanges={localChanges}
                                             statusOptions={statusOptions}
@@ -395,7 +394,7 @@ export const DataTable: React.FC = () => {
                 paginationList={tableConfig.paginationList}
                 currentPage={currentPage}
                 onPageChange={setCurrentPage}
-                totalProducts={totalProducts}
+                totalItems={totalItems}
                 totalPages={totalPages}
             />
 
@@ -406,7 +405,7 @@ export const DataTable: React.FC = () => {
                 title={deleteModal.isBulk ? t('datatable.deleteSelected') : t('common.delete')}
                 message={deleteModal.isBulk 
                     ? t('media.deleteConfirm')
-                    : t('products.deleteConfirm')
+                    : t(`${entity}.deleteConfirm`)
                 }
                 confirmText={t('common.delete')}
                 type="danger"

@@ -43,15 +43,17 @@ export const AppRoutes: React.FC = () => {
                 
                 {routes.map((route) => {
                     const Component = viewMap[route.view] || Dashboard;
+                    const entity = route.path.substring(1); // e.g., "products" from "/products"
+                    
                     return (
                         <React.Fragment key={route.path}>
-                            <Route path={route.path} element={<Component />} />
+                            <Route path={route.path} element={<Component entity={entity} />} />
                             
                             {/* Handle sub-routes for list view (Add/Edit) */}
                             {route.view === 'list' && (
                                 <>
-                                    <Route path={`${route.path}/add`} element={<DynamicForm />} />
-                                    <Route path={`${route.path}/edit/:id`} element={<DynamicForm />} />
+                                    <Route path={`${route.path}/add`} element={<DynamicForm entity={entity} />} />
+                                    <Route path={`${route.path}/edit/:id`} element={<DynamicForm entity={entity} />} />
                                 </>
                             )}
                         </React.Fragment>

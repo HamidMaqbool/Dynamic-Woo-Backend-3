@@ -22,21 +22,26 @@ import { ColorField } from './input-type/ColorField';
 import { RepeaterField } from './input-type/RepeaterField';
 import { VariationField } from './input-type/VariationField';
 
-export const DynamicForm: React.FC = () => {
+interface DynamicFormProps {
+    entity: string;
+}
+
+export const DynamicForm: React.FC<DynamicFormProps> = ({ entity }) => {
     const { t } = useTranslation();
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { editingProduct, addProduct, updateProduct, addNotification, schema, routes, fetchProductById } = useCRMStore();
+    const { addItem, updateItem, addNotification, schema, routes, fetchItemById } = useCRMStore();
     
     const listRoute = routes?.find(r => r.view === 'list');
-    const basePath = listRoute?.path || '/products';
+    const basePath = listRoute?.path || `/${entity}`;
     
-    const [formData, setFormData] = useState<Partial<Product>>({});
+    const [formData, setFormData] = useState<any>({});
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
-    const formConfig = schema?.form["auroparts-product"] || [];
+    const formKey = schema?.form[entity] ? entity : Object.keys(schema?.form || {})[0];
+    const formConfig = schema?.form[formKey] || [];
 
     useEffect(() => {
         const loadData = async () => {
@@ -45,21 +50,21 @@ export const DynamicForm: React.FC = () => {
                 return;
             }
             setIsLoading(true);
-            console.log("DynamicForm: Loading data for ID:", id);
+            console.log(`DynamicForm: Loading data for ${entity} ID:`, id);
             
             if (id) {
                 // Fetch from server
                 try {
-                    const product = await fetchProductById(id);
-                    console.log("DynamicForm: Fetched product:", product);
-                    if (product) {
-                        setFormData(product);
+                    const item = await fetchItemById(entity, id);
+                    console.log("DynamicForm: Fetched item:", item);
+                    if (item) {
+                        setFormData(item);
                     } else {
-                        console.warn("DynamicForm: Product not found, redirecting...");
+                        console.warn("DynamicForm: Item not found, redirecting...");
                         navigate(basePath);
                     }
                 } catch (err) {
-                    console.error("DynamicForm: Error fetching product:", err);
+                    console.error("DynamicForm: Error fetching item:", err);
                     navigate(basePath);
                 }
             } else {
@@ -77,7 +82,7 @@ export const DynamicForm: React.FC = () => {
             setIsLoading(false);
         };
         loadData();
-    }, [id, schema, fetchProductById, navigate]);
+    }, [id, schema, fetchItemById, navigate, entity, formConfig, basePath]);
 
     if (!schema) {
         return <FormSkeleton />;
@@ -134,19 +139,28 @@ export const DynamicForm: React.FC = () => {
         setIsSubmitting(true);
         try {
             if (id) {
-                await updateProduct(id, formData);
+                await updateItem(entity, id, formData);
             } else {
-                const newProduct: Product = {
+                // For new items, we might need some defaults if not provided
+                const newItem = {
                     ...formData,
-                    product_type: (formData.product_type as any) || 'simple',
-                    status: (formData.status as any) || 'publish',
-                    image: (formData.image as string) || 'https://picsum.photos/seed/new/100/100',
-                    identifier: (formData.identifier as string) || `AURO-${Math.floor(Math.random() * 10000)}`,
-                    parent_id: (formData.parent_id as string) || '-',
-                    title: (formData.item_name as string) || 'Untitled Product'
-                } as Product;
-                await addProduct(newProduct);
+                    status: formData.status || 'publish',
+                };
+                
+                // Add entity-specific defaults if needed
+                if (entity === 'auroparts-product') {
+                    Object.assign(newItem, {
+                        product_type: formData.product_type || 'simple',
+                        image: formData.image || 'https://picsum.photos/seed/new/100/100',
+                        identifier: formData.identifier || `AURO-${Math.floor(Math.random() * 10000)}`,
+                        parent_id: formData.parent_id || '-',
+                        title: formData.item_name || 'Untitled Product'
+                    });
+                }
+
+                await addItem(entity, newItem);
             }
+            navigate(basePath);
         } catch (error) {
             // Error is handled in store
         } finally {
@@ -284,7 +298,7 @@ export const DynamicForm: React.FC = () => {
                     </button>
                     <div>
                         <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
-                            {id ? t('common.edit') : t('common.create')} {schema.table["auroparts-product"].label.singular}
+                            {id ? t('common.edit') : t('common.create')} {schema.table[entity]?.label?.singular || entity}
                         </h1>
                         <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-0.5">
                             {id ? `${t('common.id')}: ${id}` : t('form.newEntry')}

@@ -7,22 +7,22 @@ import { DataTableCell } from './DataTableCell';
 import { Icon } from '../Icon';
 
 interface DataTableRowProps {
-    product: Product;
+    item: any;
     cols: any[];
-    selectedProductIds: string[];
+    selectedIds: string[];
     toggleSelect: (id: string) => void;
-    localChanges: Record<string, Partial<Product>>;
+    localChanges: Record<string, any>;
     statusOptions: { value: string; label: string }[];
-    handleLocalChange: (productId: string, field: string, value: any, autoUpdate?: boolean) => void;
-    handleManualUpdate: (productId: string) => void;
+    handleLocalChange: (itemId: string, field: string, value: any, autoUpdate?: boolean) => void;
+    handleManualUpdate: (itemId: string) => void;
     handleDelete: (id: string) => void;
     onEdit: (id: string) => void;
 }
 
 export const DataTableRow: React.FC<DataTableRowProps> = ({
-    product,
+    item,
     cols,
-    selectedProductIds,
+    selectedIds,
     toggleSelect,
     localChanges,
     statusOptions,
@@ -32,8 +32,8 @@ export const DataTableRow: React.FC<DataTableRowProps> = ({
     onEdit
 }) => {
     const [isExpanded, setIsExpanded] = useState(false);
-    const isSelected = selectedProductIds.includes(product.id);
-    const isNew = product.id.startsWith('NEW-');
+    const isSelected = selectedIds.includes(item.id);
+    const isNew = item.id.startsWith('NEW-');
 
     const expandableCols = cols.filter(col => col.responsive === 'expandable');
     const hasExpandable = expandableCols.length > 0;
@@ -58,7 +58,7 @@ export const DataTableRow: React.FC<DataTableRowProps> = ({
                         <input 
                             type="checkbox" 
                             checked={isSelected}
-                            onChange={() => toggleSelect(product.id)}
+                            onChange={() => toggleSelect(item.id)}
                             className="peer sr-only"
                             disabled={isNew}
                         />
@@ -114,14 +114,14 @@ export const DataTableRow: React.FC<DataTableRowProps> = ({
                         )}
                         <DataTableCell 
                             col={col}
-                            product={product}
-                            localValue={localChanges[product.id]?.[col.col as string]}
+                            item={item}
+                            localValue={localChanges[item.id]?.[col.col as string]}
                             statusOptions={statusOptions}
                             onLocalChange={handleLocalChange}
                             onManualUpdate={handleManualUpdate}
                             onDelete={handleDelete}
                             onEdit={onEdit}
-                            hasChanges={!!localChanges[product.id]}
+                            hasChanges={!!localChanges[item.id]}
                         />
                     </td>
                 ))}
@@ -146,14 +146,14 @@ export const DataTableRow: React.FC<DataTableRowProps> = ({
                                         <div className="text-sm text-slate-600">
                                             <DataTableCell 
                                                 col={col}
-                                                product={product}
-                                                localValue={localChanges[product.id]?.[col.col as string]}
+                                                item={item}
+                                                localValue={localChanges[item.id]?.[col.col as string]}
                                                 statusOptions={statusOptions}
                                                 onLocalChange={handleLocalChange}
                                                 onManualUpdate={handleManualUpdate}
                                                 onDelete={handleDelete}
                                                 onEdit={onEdit}
-                                                hasChanges={!!localChanges[product.id]}
+                                                hasChanges={!!localChanges[item.id]}
                                             />
                                         </div>
                                     </div>

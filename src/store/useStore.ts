@@ -29,7 +29,7 @@ export interface Product {
 }
 
 interface CRMState {
-    products: Product[];
+    items: any[];
     isLoading: boolean;
     sidebarData: any[];
     isSidebarLoading: boolean;
@@ -37,20 +37,17 @@ interface CRMState {
     settingsData: any | null;
     schema: any | null;
     routes: any[] | null;
-    selectedProductIds: string[];
+    selectedIds: string[];
     currentPage: number;
     itemsPerPage: number;
-    totalProducts: number;
+    totalItems: number;
     totalPages: number;
     searchQuery: string;
-    filters: {
-        status: string;
-        parentId: string;
-    };
+    filters: Record<string, any>;
     theme: 'light' | 'dark' | 'red' | 'green';
     language: string;
     direction: 'ltr' | 'rtl';
-    editingProduct: Product | null;
+    editingItem: any | null;
     notifications: { id: string; message: string; type: 'success' | 'error' }[];
     
     // Auth
@@ -59,20 +56,20 @@ interface CRMState {
     user: { email: string; name: string } | null;
     
     // Actions
-    fetchProducts: () => Promise<void>;
+    fetchData: (entity: string) => Promise<void>;
     fetchSidebar: () => Promise<void>;
     fetchDashboard: () => Promise<void>;
     fetchSettings: () => Promise<void>;
     updateSettings: (settings: any) => Promise<void>;
     fetchSchema: () => Promise<void>;
     fetchRoutes: () => Promise<void>;
-    fetchProductById: (id: string) => Promise<Product | null>;
-    setProducts: (products: Product[]) => void;
-    addProduct: (product: Product) => void;
-    updateProduct: (id: string, product: Partial<Product>) => void;
-    deleteProduct: (id: string) => Promise<void>;
-    bulkDeleteProducts: (ids: string[]) => Promise<void>;
-    setSelectedProductIds: (ids: string[]) => void;
+    fetchItemById: (entity: string, id: string) => Promise<any | null>;
+    setItems: (items: any[]) => void;
+    addItem: (entity: string, item: any) => Promise<void>;
+    updateItem: (entity: string, id: string, item: Partial<any>) => Promise<void>;
+    deleteItem: (entity: string, id: string) => Promise<void>;
+    bulkDeleteItems: (entity: string, ids: string[]) => Promise<void>;
+    setSelectedIds: (ids: string[]) => void;
     setCurrentPage: (page: number) => void;
     setItemsPerPage: (count: number) => void;
     setSearchQuery: (query: string) => void;
@@ -86,7 +83,7 @@ interface CRMState {
 }
 
 export const useCRMStore = create<CRMState>((set, get) => ({
-    products: [],
+    items: [],
     isLoading: false,
     sidebarData: [],
     isSidebarLoading: false,
@@ -94,10 +91,10 @@ export const useCRMStore = create<CRMState>((set, get) => ({
     settingsData: null,
     schema: null,
     routes: null,
-    selectedProductIds: [],
+    selectedIds: [],
     currentPage: 1,
     itemsPerPage: 10,
-    totalProducts: 0,
+    totalItems: 0,
     totalPages: 0,
     searchQuery: '',
     filters: {
@@ -107,29 +104,28 @@ export const useCRMStore = create<CRMState>((set, get) => ({
     theme: (localStorage.getItem('crm-theme') as any) || 'light',
     language: localStorage.getItem('crm-lang') || 'en',
     direction: (localStorage.getItem('crm-dir') as any) || 'ltr',
-    editingProduct: null,
+    editingItem: null,
     notifications: [],
     isAuthenticated: !!localStorage.getItem('crm-token'),
     token: localStorage.getItem('crm-token'),
     user: JSON.parse(localStorage.getItem('crm-user') || 'null'),
 
-    fetchProducts: async () => {
+    fetchData: async (entity) => {
         set({ isLoading: true });
         const { currentPage, itemsPerPage, searchQuery, filters } = get();
         try {
-            const data = await apiFetch('/api/products', {
+            const data = await apiFetch(`/api/${entity}`, {
                 params: {
                     page: currentPage.toString(),
                     limit: itemsPerPage.toString(),
                     search: searchQuery,
-                    status: filters.status,
-                    parentId: filters.parentId
+                    ...filters
                 }
             });
             set({ 
-                products: data.products, 
-                totalProducts: data.total,
-                totalPages: data.totalPages,
+                items: data[entity] || data.items || [], 
+                totalItems: data.total || 0,
+                totalPages: data.totalPages || 0,
                 isLoading: false 
             });
         } catch (error) {
@@ -160,7 +156,7 @@ export const useCRMStore = create<CRMState>((set, get) => ({
             set({ settingsData: data });
             
             // Sync language and direction from settings
-            const localizationTab = data.tabs.find((t: any) => t.id === 'localization');
+            const localizationTab = data.tabs?.find((t: any) => t.id === 'localization');
             if (localizationTab) {
                 const langField = localizationTab.sections[0].fields.find((f: any) => f.name === 'language');
                 const dirField = localizationTab.sections[0].fields.find((f: any) => f.name === 'direction');
@@ -189,7 +185,7 @@ export const useCRMStore = create<CRMState>((set, get) => ({
             });
 
             // Sync language and direction from updated settings
-            const localizationTab = data.tabs.find((t: any) => t.id === 'localization');
+            const localizationTab = data.tabs?.find((t: any) => t.id === 'localization');
             if (localizationTab) {
                 const langField = localizationTab.sections[0].fields.find((f: any) => f.name === 'language');
                 const dirField = localizationTab.sections[0].fields.find((f: any) => f.name === 'direction');
@@ -223,105 +219,101 @@ export const useCRMStore = create<CRMState>((set, get) => ({
         } catch (error) {}
     },
 
-    fetchProductById: async (id: string) => {
+    fetchItemById: async (entity, id) => {
         set({ isLoading: true });
         try {
-            const data = await apiFetch(`/api/products/${id}`);
-            set({ editingProduct: data, isLoading: false });
+            const data = await apiFetch(`/api/${entity}/${id}`);
+            set({ editingItem: data, isLoading: false });
             return data;
         } catch (error) {
             set({ isLoading: false });
-            get().addNotification('Product not found', 'error');
+            get().addNotification('Item not found', 'error');
             return null;
         }
     },
 
-    setProducts: (products) => set({ products }),
-    addProduct: async (product) => {
+    setItems: (items) => set({ items }),
+    addItem: async (entity, item) => {
         set({ isLoading: true });
         try {
-            const data = await apiFetch('/api/products', {
+            const data = await apiFetch(`/api/${entity}`, {
                 method: 'POST',
-                body: JSON.stringify(product)
+                body: JSON.stringify(item)
             });
             set((state) => ({ 
-                products: [data, ...state.products],
+                items: [data, ...state.items],
                 isLoading: false,
             }));
-            get().addNotification('Product added successfully', 'success');
-            get().fetchProducts();
+            get().addNotification('Item added successfully', 'success');
+            get().fetchData(entity);
         } catch (error) {
             set({ isLoading: false });
         }
     },
-    updateProduct: async (id, updatedFields) => {
+    updateItem: async (entity, id, updatedFields) => {
         set({ isLoading: true });
         try {
-            const data = await apiFetch(`/api/products/${id}`, {
+            const data = await apiFetch(`/api/${entity}/${id}`, {
                 method: 'PUT',
                 body: JSON.stringify(updatedFields)
             });
             set((state) => ({
-                products: state.products.map(p => p.id === id ? data : p),
+                items: state.items.map(p => p.id === id ? data : p),
                 isLoading: false,
             }));
-            get().addNotification('Product updated successfully', 'success');
-            get().fetchProducts();
+            get().addNotification('Item updated successfully', 'success');
+            get().fetchData(entity);
         } catch (error) {
             set({ isLoading: false });
         }
     },
-    deleteProduct: async (id) => {
+    deleteItem: async (entity, id) => {
         set({ isLoading: true });
         try {
-            await apiFetch(`/api/products/${id}`, { method: 'DELETE' });
+            await apiFetch(`/api/${entity}/${id}`, { method: 'DELETE' });
             set((state) => ({
-                products: state.products.filter(p => p.id !== id),
+                items: state.items.filter(p => p.id !== id),
                 isLoading: false,
             }));
-            get().addNotification('Product deleted successfully', 'success');
-            get().fetchProducts();
+            get().addNotification('Item deleted successfully', 'success');
+            get().fetchData(entity);
         } catch (error) {
             set({ isLoading: false });
         }
     },
-    bulkDeleteProducts: async (ids) => {
+    bulkDeleteItems: async (entity, ids) => {
         set({ isLoading: true });
         try {
-            await apiFetch('/api/products/bulk-delete', { 
+            await apiFetch(`/api/${entity}/bulk-delete`, { 
                 method: 'POST',
                 body: JSON.stringify({ ids })
             });
             set((state) => ({
-                products: state.products.filter(p => !ids.includes(p.id)),
+                items: state.items.filter(p => !ids.includes(p.id)),
                 isLoading: false,
-                selectedProductIds: [],
+                selectedIds: [],
             }));
-            get().addNotification(`${ids.length} products deleted successfully`, 'success');
-            get().fetchProducts();
+            get().addNotification(`${ids.length} items deleted successfully`, 'success');
+            get().fetchData(entity);
         } catch (error) {
             set({ isLoading: false });
         }
     },
-    setSelectedProductIds: (ids) => set({ selectedProductIds: ids }),
+    setSelectedIds: (ids) => set({ selectedIds: ids }),
     setCurrentPage: (page) => {
         set({ currentPage: page });
-        get().fetchProducts();
     },
     setItemsPerPage: (count) => {
         set({ itemsPerPage: count, currentPage: 1 });
-        get().fetchProducts();
     },
     setSearchQuery: (query) => {
         set({ searchQuery: query, currentPage: 1 });
-        get().fetchProducts();
     },
     setFilters: (filters) => {
         set((state) => ({ 
             filters: { ...state.filters, ...filters },
             currentPage: 1 
         }));
-        get().fetchProducts();
     },
     setTheme: (theme) => {
         localStorage.setItem('crm-theme', theme);
