@@ -198,7 +198,7 @@ export const DataTable: React.FC = () => {
             {/* Header Controls */}
             <div className="bg-white border-b border-slate-200 px-4 py-4 sm:px-8 sm:py-6 flex flex-col gap-6">
                 <TableHeader 
-                    title={schema.table["auroparts-product"].label.pulular}
+                    title={schema.table["auroparts-product"].label.plural}
                     description={t('products.manageDescription')}
                     onAddRow={handleAddRow}
                     onAddProduct={() => navigate(`${basePath}/add`)}
@@ -336,10 +336,17 @@ export const DataTable: React.FC = () => {
                                                 </svg>
                                             </label>
                                         </th>
+                                        {/* Expand Button Header (Mobile Only) */}
+                                        {cols.some((c: any) => c.responsive === 'expandable') && (
+                                            <th className="px-4 py-4 w-10 md:hidden"></th>
+                                        )}
                                         {cols.map((col: any) => (
                                             <th 
                                                 key={col.name} 
-                                                className="px-6 py-4 text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider"
+                                                className={cn(
+                                                    "px-6 py-4 text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider",
+                                                    col.responsive === 'expandable' || col.responsive === 'hide' ? "hidden md:table-cell" : "table-cell"
+                                                )}
                                                 style={{ width: col.width }}
                                             >
                                                 {col.name}
@@ -365,7 +372,7 @@ export const DataTable: React.FC = () => {
                                     ))}
                                     {allRows.length === 0 && (
                                         <tr>
-                                            <td colSpan={cols.length + 1} className="px-6 py-20 text-center">
+                                            <td colSpan={cols.length + 2} className="px-6 py-20 text-center">
                                                 <div className="flex flex-col items-center gap-3">
                                                     <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center">
                                                         <Icon name="info" className="w-6 h-6 text-slate-400" />
@@ -399,7 +406,7 @@ export const DataTable: React.FC = () => {
                 title={deleteModal.isBulk ? t('datatable.deleteSelected') : t('common.delete')}
                 message={deleteModal.isBulk 
                     ? t('media.deleteConfirm')
-                    : t('media.deleteConfirm')
+                    : t('products.deleteConfirm')
                 }
                 confirmText={t('common.delete')}
                 type="danger"

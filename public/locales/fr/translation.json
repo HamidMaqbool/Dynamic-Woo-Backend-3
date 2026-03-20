@@ -14,8 +14,18 @@
     "edit": "Modifier",
     "delete": "Supprimer",
     "add": "Ajouter nouveau",
+    "export": "Exporter",
+    "columns": "Colonnes",
+    "available_columns": "Colonnes disponibles",
     "loading": "Chargement...",
-    "no_data": "Aucune donnée trouvée"
+    "no_data": "Aucune donnée trouvée",
+    "day": "Jour",
+    "viewAll": "Voir tout",
+    "create": "Créer",
+    "id": "ID",
+    "submitting": "Envoi en cours...",
+    "success": "Succès",
+    "error": "Erreur"
   },
   "dashboard": {
     "welcome": "Bon retour",
@@ -24,7 +34,10 @@
     "total_customers": "Total clients",
     "active_products": "Produits actifs",
     "recent_orders": "Commandes récentes",
-    "sales_overview": "Aperçu des ventes"
+    "sales_overview": "Aperçu des ventes",
+    "description": "Aperçu des performances de votre entreprise et de vos activités récentes.",
+    "last_7_days": "Les 7 derniers jours",
+    "last_30_days": "Les 30 derniers jours"
   },
   "products": {
     "title": "Gestion des produits",
@@ -35,7 +48,9 @@
     "price": "Prix",
     "inventory": "Inventaire",
     "status": "Statut",
-    "actions": "Actions"
+    "actions": "Actions",
+    "manageDescription": "Gérez et surveillez votre inventaire de produits",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce produit ?"
   },
   "settings": {
     "title": "Paramètres du système",
@@ -51,6 +66,7 @@
     "site_description": "Description du site",
     "change_image": "Changer l'image",
     "select_image": "Sélectionner une image",
+    "remove_image": "Supprimer l'image",
     "no_image": "Aucune image sélectionnée",
     "save": "Enregistrer les modifications",
     "saving": "Enregistrement..."
@@ -60,6 +76,11 @@
     "subtitle": "Gérez et organisez vos ressources multimédias",
     "upload": "Télécharger",
     "library": "Bibliothèque",
+    "images": "Images",
+    "featured": "Mis en avant",
+    "addMedia": "Ajouter un média",
+    "noMediaUploaded": "Aucun média téléchargé pour le moment",
+    "clickToSelect": "Cliquez pour sélectionner des fichiers dans la médiathèque",
     "dropFiles": "Déposez les fichiers pour les télécharger",
     "browseFiles": "ou cliquez pour parcourir depuis votre ordinateur",
     "searchPlaceholder": "Rechercher des médias...",
@@ -107,6 +128,58 @@
     "optional": "Optionnel",
     "rawSchema": "Définition brute du schéma",
     "jsonFormat": "Format JSON",
+    "supportedOptions": "Options prises en charge",
+    "keyFeatures": "Caractéristiques clés",
+    "options": {
+      "placeholder": "placeholder",
+      "required": "valide (obligatoire)",
+      "tooltip": "infobulle",
+      "readOnly": "lecture seule",
+      "prefix": "préfixe",
+      "suffix": "suffixe",
+      "options_label_value": "options (paires label/valeur)",
+      "rows": "lignes",
+      "max_default_10": "max (par défaut 10)",
+      "fields_nested": "champs (définitions de champs imbriqués)",
+      "columns_table": "colonnes (définition de table)"
+    },
+    "datatableDocs": {
+      "main": {
+        "description": "Le composant de table principal qui affiche les lignes et les colonnes en fonction du schéma."
+      },
+      "DataTable": {
+        "title": "DataTable"
+      },
+      "columnTypes": {
+        "title": "Types de colonnes",
+        "description": "Rendus de cellules spécialisés pour différents types de données."
+      },
+      "TableFilters": {
+        "title": "Filtres de table",
+        "description": "Commandes de recherche et de filtrage pour la table de données."
+      },
+      "filters": {
+        "description": "Commandes de recherche et de filtrage pour la table de données."
+      }
+    },
+    "features": {
+      "sorting": "Tri",
+      "filtering": "Filtrage",
+      "pagination": "Pagination",
+      "bulkActions": "Actions groupées",
+      "searchQuery": "Requête de recherche",
+      "statusFilter": "Filtre de statut",
+      "parentIdFilter": "Filtre d'ID parent"
+    },
+    "types": {
+      "badge": "Badge",
+      "status": "Statut",
+      "image": "Image",
+      "text": "Texte",
+      "select": "Sélection",
+      "action": "Action",
+      "manualUpdate": "Mise à jour manuelle"
+    },
     "fieldDocs": {
       "text": "Saisie de texte standard sur une seule ligne pour les noms, titres et descriptions courtes.",
       "number": "Champ de saisie numérique pour les prix, quantités et mesures.",
@@ -130,7 +203,10 @@
     "deleteSelected": "Supprimer la sélection",
     "noItemsFound": "Aucun élément trouvé",
     "rowsPerPage": "Lignes par page",
-    "showing": "Affichage de {{start}} à {{end}} sur {{total}} résultats"
+    "showing": "Affichage de {{start}} à {{end}} sur {{total}} résultats",
+    "addRow": "Ajouter une ligne",
+    "enterField": "Entrez {{field}}...",
+    "deleteSelected": "Supprimer la sélection"
   },
   "auth": {
     "login": "Connexion",
@@ -138,6 +214,33 @@
     "password": "Mot de passe",
     "signIn": "Se connecter",
     "signingIn": "Connexion en cours...",
-    "invalidCredentials": "E-mail ou mot de passe invalide"
+    "invalidCredentials": "E-mail ou mot de passe invalide",
+    "emailRequired": "L'e-mail est obligatoire",
+    "emailInvalid": "Adresse e-mail invalide",
+    "passwordRequired": "Le mot de passe est obligatoire",
+    "passwordMinLength": "Le mot de passe doit comporter au moins 6 caractères",
+    "welcome": "Bon retour",
+    "subtitle": "Veuillez entrer vos coordonnées pour vous connecter",
+    "forgot": "Mot de passe oublié ?",
+    "keepSignedIn": "Rester connecté",
+    "noAccount": "Vous n'avez pas de compte ?",
+    "contactSupport": "Contacter le support"
+  },
+  "status": {
+    "publish": "Publié",
+    "draft": "Brouillon",
+    "pending": "En attente",
+    "archived": "Archivé"
+  },
+  "badge": {
+    "variation": "Variation",
+    "simple": "Simple"
+  },
+  "form": {
+    "fixErrors": "Veuillez corriger les erreurs dans le formulaire",
+    "newEntry": "Nouvelle entrée",
+    "savingChanges": "Enregistrement des modifications...",
+    "confirm": "Confirmer",
+    "cancel": "Annuler"
   }
 }

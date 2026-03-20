@@ -7,7 +7,7 @@
                 { "label": "Published Products", "action": "published-products" },
                 { "label": "Draft Products", "action": "draft-products" }
             ],
-            "label": { "singular": "Product", "pulular": "Products" },
+            "label": { "singular": "Product", "plural": "Products" },
             "tabs": [
                 { "label": "Products", "route": "posts.index", "var": ["type"] },
                 { "label": "Variations($variation_count)", "route": "posts.variations", "var": ["type", "parent_id$parent_id"] },
@@ -19,15 +19,15 @@
                 "paginationPerPage": 10,
                 "paginationList": [10, 20, 50, 100],
                 "cols": [
-                    { "name": "ID", "sortable": true, "col": "id", "searchable": true, "width": "80px" },
-                    { "name": "Image", "sortable": false, "col": "image", "type": "image", "width": "80px" },
-                    { "name": "Type", "sortable": true, "col": "product_type", "type": "badge", "width": "100px" },
-                    { "name": "AuropartsID", "sortable": true, "searchable": true, "col": "identifier", "width": "150px" },
-                    { "name": "Parent", "sortable": true, "searchable": true, "col": "parent_id", "width": "120px" },
-                    { "name": "Title", "sortable": true, "searchable": true, "col": "title", "columnType": "text", "autoUpdate": true, "width": "300px" },
-                    { "name": "Status", "sortable": true, "col": "status", "width": "150px", "columnType": "select" },
-                    { "name": "Created Date", "sortable": true, "col": "created_at", "width": "150px" },
-                    { "name": "Action", "sortable": true, "col": ["edit", "delete"], "type": "action", "width": "150px" }
+                    { "name": "ID", "sortable": true, "col": "id", "searchable": true, "width": "80px", "responsive": "show" },
+                    { "name": "Image", "sortable": false, "col": "image", "type": "image", "width": "80px", "responsive": "show" },
+                    { "name": "Type", "sortable": true, "col": "product_type", "type": "badge", "width": "100px", "responsive": "expandable" },
+                    { "name": "AuropartsID", "sortable": true, "searchable": true, "col": "identifier", "width": "150px", "responsive": "hide" },
+                    { "name": "Parent", "sortable": true, "searchable": true, "col": "parent_id", "width": "120px", "responsive": "expandable" },
+                    { "name": "Title", "sortable": true, "searchable": true, "col": "title", "columnType": "text", "autoUpdate": true, "width": "300px", "responsive": "expandable" },
+                    { "name": "Status", "sortable": true, "col": "status", "width": "150px", "columnType": "select", "responsive": "expandable" },
+                    { "name": "Created Date", "sortable": true, "col": "created_at", "width": "150px", "responsive": "hide" },
+                    { "name": "Action", "sortable": true, "col": ["edit", "delete"], "type": "action", "width": "150px", "responsive": "expandable" }
                 ]
             }
         }

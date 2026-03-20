@@ -20,7 +20,12 @@
     "loading": "Loading...",
     "no_data": "No data found",
     "day": "Day",
-    "viewAll": "View All"
+    "viewAll": "View All",
+    "create": "Create",
+    "id": "ID",
+    "submitting": "Submitting...",
+    "success": "Success",
+    "error": "Error"
   },
   "dashboard": {
     "welcome": "Welcome back",
@@ -44,7 +49,8 @@
     "inventory": "Inventory",
     "status": "Status",
     "actions": "Actions",
-    "manageDescription": "Manage and monitor your product inventory"
+    "manageDescription": "Manage and monitor your product inventory",
+    "deleteConfirm": "Are you sure you want to delete this product?"
   },
   "settings": {
     "title": "System Settings",
@@ -199,7 +205,8 @@
     "rowsPerPage": "Rows per page",
     "showing": "Showing {{start}} to {{end}} of {{total}} results",
     "addRow": "Add Row",
-    "enterField": "Enter {{field}}..."
+    "enterField": "Enter {{field}}...",
+    "deleteSelected": "Delete Selected"
   },
   "auth": {
     "login": "Login",
@@ -207,6 +214,33 @@
     "password": "Password",
     "signIn": "Sign In",
     "signingIn": "Signing in...",
-    "invalidCredentials": "Invalid email or password"
+    "invalidCredentials": "Invalid email or password",
+    "emailRequired": "Email is required",
+    "emailInvalid": "Invalid email address",
+    "passwordRequired": "Password is required",
+    "passwordMinLength": "Password must be at least 6 characters",
+    "welcome": "Welcome Back",
+    "subtitle": "Please enter your details to sign in",
+    "forgot": "Forgot password?",
+    "keepSignedIn": "Keep me signed in",
+    "noAccount": "Don't have an account?",
+    "contactSupport": "Contact support"
+  },
+  "status": {
+    "publish": "Published",
+    "draft": "Draft",
+    "pending": "Pending",
+    "archived": "Archived"
+  },
+  "badge": {
+    "variation": "Variation",
+    "simple": "Simple"
+  },
+  "form": {
+    "fixErrors": "Please fix the errors in the form",
+    "newEntry": "New Entry",
+    "savingChanges": "Saving changes...",
+    "confirm": "Confirm",
+    "cancel": "Cancel"
   }
 }

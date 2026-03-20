@@ -1,12 +1,14 @@
 
 import React from 'react';
 import { cn } from '../../utils/cn';
+import { useTranslation } from 'react-i18next';
 
 interface StatusColumnProps {
     status: string;
 }
 
 export const StatusColumn: React.FC<StatusColumnProps> = ({ status }) => {
+    const { t } = useTranslation();
     const isPublished = status === 'publish';
     return (
         <span className={cn(
@@ -16,7 +18,7 @@ export const StatusColumn: React.FC<StatusColumnProps> = ({ status }) => {
                 : "bg-amber-50 text-amber-600 border border-amber-100"
         )}>
             <span className={cn("w-1.5 h-1.5 rounded-full mr-1.5", isPublished ? "bg-emerald-500" : "bg-amber-500")}></span>
-            {status}
+            {t(`status.${status}`, status)}
         </span>
     );
 };

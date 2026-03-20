@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Icon } from './Icon';
+import { useTranslation } from 'react-i18next';
 
 interface ConfirmationModalProps {
     isOpen: boolean;
@@ -19,10 +20,14 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     onConfirm,
     title,
     message,
-    confirmText = 'Confirm',
-    cancelText = 'Cancel',
+    confirmText,
+    cancelText,
     type = 'danger'
 }) => {
+    const { t } = useTranslation();
+    const effectiveConfirmText = confirmText || t('form.confirm');
+    const effectiveCancelText = cancelText || t('form.cancel');
+
     return (
         <AnimatePresence>
             {isOpen && (
@@ -56,7 +61,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                                 onClick={onClose}
                                 className="flex-1 px-6 py-3 text-sm font-bold text-slate-600 hover:bg-slate-200 rounded-2xl transition-colors"
                             >
-                                {cancelText}
+                                {effectiveCancelText}
                             </button>
                             <button
                                 onClick={() => {
@@ -69,7 +74,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                                     'bg-accent hover:opacity-90 shadow-accent/20'
                                 }`}
                             >
-                                {confirmText}
+                                {effectiveConfirmText}
                             </button>
                         </div>
                     </motion.div>

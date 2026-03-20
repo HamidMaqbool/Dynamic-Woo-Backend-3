@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Icon } from './Icon';
 import { useCRMStore } from '../store/useStore';
 import { cn } from '../utils/cn';
+import { useTranslation } from 'react-i18next';
 
 const TOAST_DURATION = 5000;
 
@@ -15,6 +16,7 @@ interface ToastProps {
 }
 
 const Toast: React.FC<ToastProps> = ({ id, message, type, onRemove }) => {
+  const { t } = useTranslation();
   const [progress, setProgress] = useState(100);
   const [isPaused, setIsPaused] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -92,7 +94,7 @@ const Toast: React.FC<ToastProps> = ({ id, message, type, onRemove }) => {
       
       <div className="flex-1">
         <p className="font-bold text-sm leading-tight uppercase tracking-wider">
-          {type === 'success' ? 'Success' : 'Error'}
+          {type === 'success' ? t('common.success') : t('common.error')}
         </p>
         <p className="text-xs opacity-90 mt-1 font-medium">{message}</p>
       </div>

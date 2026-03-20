@@ -20,7 +20,12 @@
     "loading": "جاري التحميل...",
     "no_data": "لم يتم العثور على بيانات",
     "day": "يوم",
-    "viewAll": "عرض الكل"
+    "viewAll": "عرض الكل",
+    "create": "إنشاء",
+    "id": "معرف",
+    "submitting": "جاري الإرسال...",
+    "success": "نجاح",
+    "error": "خطأ"
   },
   "dashboard": {
     "welcome": "مرحباً بك مرة أخرى",
@@ -44,7 +49,8 @@
     "inventory": "المخزون",
     "status": "الحالة",
     "actions": "الإجراءات",
-    "manageDescription": "إدارة ومراقبة مخزون المنتجات الخاص بك"
+    "manageDescription": "إدارة ومراقبة مخزون المنتجات الخاص بك",
+    "deleteConfirm": "هل أنت متأكد أنك تريد حذف هذا المنتج؟"
   },
   "settings": {
     "title": "إعدادات النظام",
@@ -199,7 +205,8 @@
     "rowsPerPage": "عدد الصفوف في الصفحة",
     "showing": "عرض {{start}} إلى {{end}} من أصل {{total}} نتائج",
     "addRow": "إضافة صف",
-    "enterField": "أدخل {{field}}..."
+    "enterField": "أدخل {{field}}...",
+    "deleteSelected": "حذف المحدد"
   },
   "auth": {
     "login": "تسجيل الدخول",
@@ -207,6 +214,33 @@
     "password": "كلمة المرور",
     "signIn": "تسجيل الدخول",
     "signingIn": "جاري تسجيل الدخول...",
-    "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صالحة"
+    "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صالحة",
+    "emailRequired": "البريد الإلكتروني مطلوب",
+    "emailInvalid": "عنوان البريد الإلكتروني غير صالح",
+    "passwordRequired": "كلمة المرور مطلوبة",
+    "passwordMinLength": "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل",
+    "welcome": "مرحباً بك مرة أخرى",
+    "subtitle": "يرجى إدخال بياناتك لتسجيل الدخول",
+    "forgot": "هل نسيت كلمة المرور؟",
+    "keepSignedIn": "ابقني مسجلاً للدخول",
+    "noAccount": "ليس لديك حساب؟",
+    "contactSupport": "اتصل بالدعم"
+  },
+  "status": {
+    "publish": "منشور",
+    "draft": "مسودة",
+    "pending": "قيد الانتظار",
+    "archived": "مؤرشف"
+  },
+  "badge": {
+    "variation": "متنوع",
+    "simple": "بسيط"
+  },
+  "form": {
+    "fixErrors": "يرجى تصحيح الأخطاء في النموذج",
+    "newEntry": "إدخال جديد",
+    "savingChanges": "جاري حفظ التغييرات...",
+    "confirm": "تأكيد",
+    "cancel": "إلغاء"
   }
 }
