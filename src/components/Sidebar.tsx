@@ -219,15 +219,7 @@ export const Sidebar: React.FC = () => {
                 )}
             </nav>
 
-            {/* Collapse Toggle */}
-            <div className="p-4 border-t border-slate-800 hidden md:block">
-                <button 
-                    onClick={() => setIsCollapsed(!isCollapsed)}
-                    className="w-full flex items-center justify-center p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-all"
-                >
-                    <Icon name={collapsed ? "chevron-right" : "chevron-left"} className="w-5 h-5" />
-                </button>
-            </div>
+           
 
             {/* User Profile */}
             {!collapsed && user && (

@@ -13,10 +13,7 @@
         "title": "All Products",
         "path": "products"
       },
-       {
-        "title": "Hello",
-        "path": "hello/all"
-      },
+       
       {
         "title": "Add New",
         "path": "my-products/add"
@@ -46,11 +43,6 @@
     "title": "Media",
     "icon": "image",
     "path": "media"
-  },
-  {
-    "title": "Settings",
-    "icon": "settings",
-    "path": "settings"
   },
   {
     "title": "Usage Guide",
