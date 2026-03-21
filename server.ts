@@ -30,7 +30,7 @@ async function syncDatabase() {
 
       // Create table if not exists
       await pool.query(`
-        CREATE TABLE IF NOT EXISTS ${sqlTableName} (
+        CREATE TABLE IF NOT EXISTS "${sqlTableName}" (
           id TEXT PRIMARY KEY,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
@@ -50,18 +50,16 @@ async function syncDatabase() {
           const checkColQuery = `
             SELECT column_name 
             FROM information_schema.columns 
-            WHERE table_name = '${sqlTableName}' AND column_name = '${colName}'
+            WHERE table_name = LOWER($1) AND column_name = LOWER($2)
+            AND table_schema = 'public'
           `;
-          const res = await pool.query(checkColQuery);
+          const res = await pool.query(checkColQuery, [sqlTableName, colName]);
           
           if (res.rows.length === 0) {
             console.log(`Adding column ${colName} to ${sqlTableName}`);
-            let alterQuery = `ALTER TABLE ${sqlTableName} ADD COLUMN "${colName}" ${colType}`;
+            let alterQuery = `ALTER TABLE "${sqlTableName}" ADD COLUMN "${colName}" ${colType}`;
             if (isUnique) alterQuery += ` ${isUnique}`;
             if (isRequired) {
-              // For NOT NULL, we might need a default value if there's existing data
-              // But for simplicity in this dynamic setup, we'll just add it
-              // In production, you'd handle this more carefully
               alterQuery += ` ${isRequired}`;
             }
             await pool.query(alterQuery);
@@ -69,7 +67,7 @@ async function syncDatabase() {
             // Add index for searchable columns
             if (col.searchable) {
               console.log(`Adding index for ${colName} on ${sqlTableName}`);
-              await pool.query(`CREATE INDEX IF NOT EXISTS idx_${sqlTableName}_${colName} ON ${sqlTableName}("${colName}")`);
+              await pool.query(`CREATE INDEX IF NOT EXISTS idx_${sqlTableName}_${colName} ON "${sqlTableName}"("${colName}")`);
             }
           }
         }
@@ -87,12 +85,13 @@ async function syncDatabase() {
               const res = await pool.query(`
                 SELECT column_name 
                 FROM information_schema.columns 
-                WHERE table_name = '${sqlTableName}' AND column_name = '${colName}'
-              `);
+                WHERE table_name = LOWER($1) AND column_name = LOWER($2)
+                AND table_schema = 'public'
+              `, [sqlTableName, colName]);
               
               if (res.rows.length === 0) {
                 console.log(`Adding form column ${colName} to ${sqlTableName}`);
-                await pool.query(`ALTER TABLE ${sqlTableName} ADD COLUMN "${colName}" ${colType}`);
+                await pool.query(`ALTER TABLE "${sqlTableName}" ADD COLUMN "${colName}" ${colType}`);
               }
             }
           }
@@ -170,16 +169,111 @@ async function migrateData() {
       }
     }
 
+    // Add sample roles
+    const roleTable = "user_roles";
+    try {
+      const roleCheck = await pool.query(`SELECT COUNT(*) FROM ${roleTable}`);
+      if (parseInt(roleCheck.rows[0].count) === 0) {
+        const sampleRoles = [
+          {
+            name: 'manager',
+            description: 'Store Manager with full access to products and orders',
+            access_config: {
+              permissions: [
+                { module: 'dashboard', access: 'read' },
+                { module: 'products', access: 'write' },
+                { module: 'orders', access: 'write' },
+                { module: 'customers', access: 'read' }
+              ],
+              accessible_menus: [
+                { path: 'dashboard' },
+                { path: 'orders' },
+                { path: 'products' },
+                { path: 'customers' }
+              ]
+            }
+          },
+          {
+            name: 'editor',
+            description: 'Content Editor with access to products and media',
+            access_config: {
+              permissions: [
+                { module: 'products', access: 'write' },
+                { module: 'media', access: 'write' }
+              ],
+              accessible_menus: [
+                { path: 'products' },
+                { path: 'media' }
+              ]
+            }
+          },
+          {
+            name: 'support',
+            description: 'Customer Support with access to orders and customers',
+            access_config: {
+              permissions: [
+                { module: 'orders', access: 'read' },
+                { module: 'customers', access: 'write' }
+              ],
+              accessible_menus: [
+                { path: 'orders' },
+                { path: 'customers' }
+              ]
+            }
+          }
+        ];
+
+        console.log(`Adding ${sampleRoles.length} sample roles to PostgreSQL...`);
+        for (const role of sampleRoles) {
+          const roleId = `ROLE-${role.name.toUpperCase()}`;
+          await pool.query(
+            `INSERT INTO ${roleTable} (id, name, description, access_config) VALUES ($1, $2, $3, $4)`,
+            [roleId, role.name, role.description, JSON.stringify(role.access_config)]
+          );
+        }
+      }
+    } catch (e) {
+      console.log("Role table might not be ready yet, skipping sample roles migration.");
+    }
+
     // Migrate Users (Initial Admin)
     const usersTable = "users";
     const usersCheck = await pool.query(`SELECT COUNT(*) FROM ${usersTable}`);
     if (parseInt(usersCheck.rows[0].count) === 0) {
-      console.log("Creating initial admin user...");
+      console.log("Creating initial users...");
       const hashedPassword = await bcrypt.hash("admin123", 10);
+      
+      // Admin
       await pool.query(`
-        INSERT INTO ${usersTable} (id, name, email, password, role) 
-        VALUES ($1, $2, $3, $4, $5)
-      `, [`USR-${Date.now()}`, "Admin User", "admin@auroparts.com", hashedPassword, "admin"]);
+        INSERT INTO ${usersTable} (id, name, email, password, role, permissions) 
+        VALUES ($1, $2, $3, $4, $5, $6)
+      `, [`USR-ADMIN`, "Admin User", "admin@auroparts.com", hashedPassword, "admin", JSON.stringify([
+        { module: "dashboard", access: "write" },
+        { module: "products", access: "write" },
+        { module: "customers", access: "write" },
+        { module: "users", access: "write" },
+        { module: "media", access: "write" },
+        { module: "settings", access: "write" }
+      ])]);
+
+      // Editor
+      await pool.query(`
+        INSERT INTO ${usersTable} (id, name, email, password, role, permissions) 
+        VALUES ($1, $2, $3, $4, $5, $6)
+      `, [`USR-EDITOR`, "Editor User", "editor@auroparts.com", hashedPassword, "editor", JSON.stringify([
+        { module: "dashboard", access: "read" },
+        { module: "products", access: "write" },
+        { module: "media", access: "write" }
+      ])]);
+
+      // Viewer
+      await pool.query(`
+        INSERT INTO ${usersTable} (id, name, email, password, role, permissions) 
+        VALUES ($1, $2, $3, $4, $5, $6)
+      `, [`USR-VIEWER`, "Viewer User", "viewer@auroparts.com", hashedPassword, "user", JSON.stringify([
+        { module: "dashboard", access: "read" },
+        { module: "products", access: "read" }
+      ])]);
     }
 
     console.log("Data migration completed successfully.");
@@ -235,9 +329,34 @@ async function startServer() {
         const user = result.rows[0];
         const isMatch = await bcrypt.compare(password, user.password);
         if (isMatch) {
+          // Fetch role data if available
+          let roleData = null;
+          if (user.role && user.role !== 'admin') {
+            const roleRes = await pool.query('SELECT * FROM user_roles WHERE name = $1', [user.role]);
+            if (roleRes.rows.length > 0) {
+              roleData = roleRes.rows[0];
+            }
+          }
+
+          const accessConfig = roleData?.access_config 
+            ? (typeof roleData.access_config === 'string' ? JSON.parse(roleData.access_config) : roleData.access_config)
+            : null;
+
+          const permissions = user.permissions 
+            ? (typeof user.permissions === 'string' ? JSON.parse(user.permissions) : user.permissions)
+            : (accessConfig?.permissions || []);
+
+          const accessibleMenus = accessConfig?.accessible_menus || null;
+
           res.json({ 
             success: true, 
-            user: { email: user.email, name: user.name, role: user.role },
+            user: { 
+              email: user.email, 
+              name: user.name, 
+              role: user.role,
+              permissions,
+              accessibleMenus
+            },
             token: VALID_TOKEN 
           });
         } else {
@@ -248,7 +367,7 @@ async function startServer() {
       }
     } catch (err) {
       console.error("Login error:", err);
-      res.status(500).json({ success: false, message: "Database error" });
+      res.status(500).json({ success: false, message: "Database error", details: (err as any).message });
     }
   });
 
@@ -276,8 +395,13 @@ async function startServer() {
 
   // API Routes
   app.get("/api/sidebar", (req, res) => {
-    const data = JSON.parse(fs.readFileSync(path.join(process.cwd(), "server/data/sidebar.json"), "utf-8"));
-    res.json(data);
+    try {
+      const data = JSON.parse(fs.readFileSync(path.join(process.cwd(), "server/data/sidebar.json"), "utf-8"));
+      res.json(data);
+    } catch (err) {
+      console.error("Error reading sidebar.json:", err);
+      res.status(500).json({ message: "Error reading sidebar data", details: (err as any).message });
+    }
   });
 
   app.get("/api/media", async (req, res) => {
@@ -323,8 +447,8 @@ async function startServer() {
         totalPages: Math.ceil(total / Number(limit))
       });
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: "Database error" });
+      console.error("Media fetch error:", err);
+      res.status(500).json({ message: "Database error", details: (err as any).message });
     }
   });
 
@@ -341,8 +465,8 @@ async function startServer() {
       const result = await pool.query(query, values);
       res.status(201).json(result.rows[0]);
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: "Database error" });
+      console.error("Media upload error:", err);
+      res.status(500).json({ message: "Database error", details: (err as any).message });
     }
   });
 
@@ -361,13 +485,23 @@ async function startServer() {
   });
 
   app.get("/api/schema", (req, res) => {
-    const data = JSON.parse(fs.readFileSync(path.join(process.cwd(), "server/data/schema.json"), "utf-8"));
-    res.json(data);
+    try {
+      const data = JSON.parse(fs.readFileSync(path.join(process.cwd(), "server/data/schema.json"), "utf-8"));
+      res.json(data);
+    } catch (err) {
+      console.error("Error reading schema.json:", err);
+      res.status(500).json({ message: "Error reading schema data", details: (err as any).message });
+    }
   });
 
   app.get("/api/routes", (req, res) => {
-    const data = JSON.parse(fs.readFileSync(path.join(process.cwd(), "server/data/routes.json"), "utf-8"));
-    res.json(data);
+    try {
+      const data = JSON.parse(fs.readFileSync(path.join(process.cwd(), "server/data/routes.json"), "utf-8"));
+      res.json(data);
+    } catch (err) {
+      console.error("Error reading routes.json:", err);
+      res.status(500).json({ message: "Error reading routes data", details: (err as any).message });
+    }
   });
 
   // Dynamic Table Routes
@@ -430,15 +564,15 @@ async function startServer() {
             const responseKey = pluralLabel || tableName.replace(/-/g, "_");
 
             res.json({
-              [responseKey]: result.rows,
+              [tableName]: result.rows,
               total,
               page: Number(page),
               limit: Number(limit),
               totalPages: Math.ceil(total / Number(limit))
             });
           } catch (err) {
-            console.error(err);
-            res.status(500).json({ message: "Database error" });
+            console.error(`Error fetching ${routeName}:`, err);
+            res.status(500).json({ message: "Database error", details: (err as any).message });
           }
         });
 
@@ -460,19 +594,37 @@ async function startServer() {
         // POST /api/{routeName}
         app.post(`/api/${routeName}`, async (req, res) => {
           try {
-            const data = req.body;
+            const data: any = { ...req.body };
+            delete data.id;
+            delete data.created_at;
+            delete data.save;
+            
             const prefix = sqlTableName.substring(0, 3).toUpperCase();
             const id = `${prefix}-${Date.now()}`;
             
             // If it's users table, hash password
-            if (sqlTableName === "users" && data.password) {
+            if (sqlTableName === "users" && data.password && data.password.trim() !== "") {
               data.password = await bcrypt.hash(data.password, 10);
             }
 
-            const columns = ["id", ...Object.keys(data)];
-            const values = [id, ...Object.values(data).map(val => 
-              (typeof val === 'object' && val !== null) ? JSON.stringify(val) : val
-            )];
+            // Fetch actual columns from database to filter data
+            const colCheck = await pool.query(`
+              SELECT column_name 
+              FROM information_schema.columns 
+              WHERE table_name = LOWER($1) AND table_schema = 'public'
+            `, [sqlTableName]);
+            const existingCols = colCheck.rows.map(r => r.column_name.toLowerCase());
+
+            const columns = ["id"];
+            const values: any[] = [id];
+
+            for (const key of Object.keys(data)) {
+              if (existingCols.includes(key.toLowerCase())) {
+                columns.push(key);
+                const val = data[key];
+                values.push((typeof val === 'object' && val !== null) ? JSON.stringify(val) : val);
+              }
+            }
             
             const placeholders = values.map((_, i) => `$${i + 1}`).join(", ");
             const query = `INSERT INTO ${sqlTableName} (${columns.map(c => `"${c}"`).join(", ")}) VALUES (${placeholders}) RETURNING *`;
@@ -480,8 +632,8 @@ async function startServer() {
             const result = await pool.query(query, values);
             res.status(201).json(result.rows[0]);
           } catch (err) {
-            console.error(err);
-            res.status(500).json({ message: "Database error" });
+            console.error(`Error creating ${routeName}:`, err);
+            res.status(500).json({ message: "Database error", details: (err as any).message });
           }
         });
 
@@ -489,29 +641,55 @@ async function startServer() {
         app.put(`/api/${routeName}/:id`, async (req, res) => {
           try {
             const { id } = req.params;
-            const updates = req.body;
+            const updates: any = { ...req.body };
+            delete updates.id;
+            delete updates.created_at;
+            delete updates.save;
             
             // If it's users table and password is being updated, hash it
-            if (sqlTableName === "users" && updates.password) {
-              updates.password = await bcrypt.hash(updates.password, 10);
+            if (sqlTableName === "users") {
+              if (updates.password && updates.password.trim() !== "") {
+                updates.password = await bcrypt.hash(updates.password, 10);
+              } else {
+                delete updates.password;
+              }
             }
 
-            const columns = Object.keys(updates);
-            const values = Object.values(updates).map(val => 
-              (typeof val === 'object' && val !== null) ? JSON.stringify(val) : val
-            );
+            // Fetch actual columns from database to filter updates
+            const colCheck = await pool.query(`
+              SELECT column_name 
+              FROM information_schema.columns 
+              WHERE table_name = LOWER($1) AND table_schema = 'public'
+            `, [sqlTableName]);
+            const existingCols = colCheck.rows.map(r => r.column_name.toLowerCase());
+
+            const setClauses = [];
+            const values: any[] = [id];
+            let paramIndex = 2;
+
+            for (const [key, value] of Object.entries(updates)) {
+              if (existingCols.includes(key.toLowerCase())) {
+                setClauses.push(`"${key}" = $${paramIndex}`);
+                values.push((typeof value === 'object' && value !== null) ? JSON.stringify(value) : value);
+                paramIndex++;
+              }
+            }
+
+            if (setClauses.length === 0) {
+              return res.json({ message: "No valid fields to update" });
+            }
+
+            const query = `UPDATE ${sqlTableName} SET ${setClauses.join(", ")} WHERE id = $1 RETURNING *`;
+            const result = await pool.query(query, values);
             
-            const setClause = columns.map((col, i) => `"${col}" = $${i + 2}`).join(", ");
-            const query = `UPDATE ${sqlTableName} SET ${setClause} WHERE id = $1 RETURNING *`;
-            
-            const result = await pool.query(query, [id, ...values]);
             if (result.rows.length > 0) {
               res.json(result.rows[0]);
             } else {
               res.status(404).json({ message: "Not found" });
             }
           } catch (err) {
-            res.status(500).json({ message: "Database error" });
+            console.error(`Error updating ${routeName}:`, err);
+            res.status(500).json({ message: "Database error", details: (err as any).message });
           }
         });
 
@@ -526,7 +704,8 @@ async function startServer() {
               res.status(404).json({ message: "Not found" });
             }
           } catch (err) {
-            res.status(500).json({ message: "Database error" });
+            console.error(`Error deleting ${routeName}:`, err);
+            res.status(500).json({ message: "Database error", details: (err as any).message });
           }
         });
 
@@ -537,7 +716,8 @@ async function startServer() {
             await pool.query(`DELETE FROM ${sqlTableName} WHERE id = ANY($1)`, [ids]);
             res.json({ success: true, message: `${ids.length} items deleted` });
           } catch (err) {
-            res.status(500).json({ message: "Database error" });
+            console.error(`Error bulk deleting ${routeName}:`, err);
+            res.status(500).json({ message: "Database error", details: (err as any).message });
           }
         });
       }
@@ -545,8 +725,33 @@ async function startServer() {
   }
 
   app.get("/api/dashboard", (req, res) => {
-    const data = JSON.parse(fs.readFileSync(path.join(process.cwd(), "server/data/dashboard.json"), "utf-8"));
-    res.json(data);
+    try {
+      const data = JSON.parse(fs.readFileSync(path.join(process.cwd(), "server/data/dashboard.json"), "utf-8"));
+      res.json(data);
+    } catch (err) {
+      console.error("Error reading dashboard.json:", err);
+      res.status(500).json({ message: "Error reading dashboard data", details: (err as any).message });
+    }
+  });
+
+  app.get("/api/available-permissions", (req, res) => {
+    try {
+      const data = JSON.parse(fs.readFileSync(path.join(process.cwd(), "server/data/available-permissions.json"), "utf-8"));
+      res.json(data);
+    } catch (err) {
+      console.error("Error reading available-permissions.json:", err);
+      res.status(500).json({ message: "Error reading available-permissions data", details: (err as any).message });
+    }
+  });
+
+  app.get("/api/roles/list", async (req, res) => {
+    try {
+      const result = await pool.query("SELECT name FROM user_roles ORDER BY name ASC");
+      res.json(result.rows.map(r => ({ value: r.name, label: r.name.charAt(0).toUpperCase() + r.name.slice(1) })));
+    } catch (err) {
+      console.error("Error fetching roles list:", err);
+      res.status(500).json({ message: "Error fetching roles list" });
+    }
   });
 
   app.get("/api/settings", async (req, res) => {
@@ -572,6 +777,11 @@ async function startServer() {
     } catch (err) {
       res.status(500).json({ message: "Database error" });
     }
+  });
+
+  // 404 handler for API routes
+  app.use("/api/*", (req, res) => {
+    res.status(404).json({ message: `API endpoint not found: ${req.originalUrl}` });
   });
 
   // Vite middleware for development

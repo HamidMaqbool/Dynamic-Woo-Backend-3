@@ -12,6 +12,7 @@ import { TableFilters } from './TableFilters';
 import { TablePagination } from './TablePagination';
 import { useTranslation } from 'react-i18next';
 
+import { usePermissions } from '../../hooks/usePermissions';
 import { DataTableRow } from './DataTableRow';
 
 interface DataTableProps {
@@ -21,6 +22,8 @@ interface DataTableProps {
 export const DataTable: React.FC<DataTableProps> = ({ entity = 'products' }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const { hasPermission } = usePermissions();
+    const canWrite = hasPermission(entity, 'write');
     const { 
         items, 
         isLoading,
@@ -206,8 +209,8 @@ export const DataTable: React.FC<DataTableProps> = ({ entity = 'products' }) => 
                 <TableHeader 
                     title={schema.table[tableKey].label.plural}
                     description={t(`${entity}.manageDescription`)}
-                    onAddRow={handleAddRow}
-                    onAddProduct={() => navigate(`${basePath}/add`)}
+                    onAddRow={canWrite ? handleAddRow : undefined}
+                    onAddProduct={canWrite ? () => navigate(`${basePath}/add`) : undefined}
                     addProductLabel={schema.table[tableKey].label.singular}
                 />
 
@@ -365,8 +368,8 @@ export const DataTable: React.FC<DataTableProps> = ({ entity = 'products' }) => 
                                             statusOptions={statusOptions}
                                             handleLocalChange={handleLocalChange}
                                             handleManualUpdate={handleManualUpdate}
-                                            handleDelete={handleDelete}
-                                            onEdit={(id) => navigate(`${basePath}/edit/${id}`)}
+                                            handleDelete={canWrite ? handleDelete : undefined}
+                                            onEdit={canWrite ? (id) => navigate(`${basePath}/edit/${id}`) : undefined}
                                         />
                                     ))}
                                     {allRows.length === 0 && (

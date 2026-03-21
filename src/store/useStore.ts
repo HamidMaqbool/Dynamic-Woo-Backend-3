@@ -53,7 +53,13 @@ interface CRMState {
     // Auth
     isAuthenticated: boolean;
     token: string | null;
-    user: { email: string; name: string } | null;
+    user: { 
+        email: string; 
+        name: string; 
+        role: string; 
+        permissions?: { module: string; access: string }[];
+        accessibleMenus?: { path: string }[];
+    } | null;
     
     // Actions
     fetchData: (entity: string) => Promise<void>;

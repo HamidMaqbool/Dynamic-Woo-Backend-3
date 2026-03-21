@@ -1,0 +1,27 @@
+{
+  "modules": [
+    { "id": "dashboard", "label": "Dashboard" },
+    { "id": "orders", "label": "Orders" },
+    { "id": "products", "label": "Products" },
+    { "id": "customers", "label": "Customers" },
+    { "id": "users", "label": "Users" },
+    { "id": "media", "label": "Media" },
+    { "id": "inventory", "label": "Inventory" },
+    { "id": "reports", "label": "Reports" },
+    { "id": "settings", "label": "Settings" }
+  ],
+  "menus": [
+    { "path": "dashboard", "label": "Dashboard" },
+    { "path": "orders", "label": "Orders" },
+    { "path": "products", "label": "Products" },
+    { "path": "my-products/add", "label": "Add Product" },
+    { "path": "customers", "label": "Customers" },
+    { "path": "users", "label": "Users" },
+    { "path": "users/add", "label": "Add User" },
+    { "path": "user-roles", "label": "User Roles" },
+    { "path": "media", "label": "Media" },
+    { "path": "inventory", "label": "Inventory" },
+    { "path": "reports", "label": "Reports" },
+    { "path": "usage", "label": "Usage Guide" }
+  ]
+}

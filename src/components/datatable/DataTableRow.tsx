@@ -15,8 +15,8 @@ interface DataTableRowProps {
     statusOptions: { value: string; label: string }[];
     handleLocalChange: (itemId: string, field: string, value: any, autoUpdate?: boolean) => void;
     handleManualUpdate: (itemId: string) => void;
-    handleDelete: (id: string) => void;
-    onEdit: (id: string) => void;
+    handleDelete?: (id: string) => void;
+    onEdit?: (id: string) => void;
 }
 
 export const DataTableRow: React.FC<DataTableRowProps> = ({

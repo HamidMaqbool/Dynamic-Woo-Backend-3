@@ -4,8 +4,8 @@ import { Icon } from '../Icon';
 import { useTranslation } from 'react-i18next';
 
 interface RowActionsProps {
-    onEdit: () => void;
-    onDelete: () => void;
+    onEdit?: () => void;
+    onDelete?: () => void;
     onUpdate?: () => void;
     hasChanges?: boolean;
     isNew?: boolean;
@@ -30,7 +30,7 @@ export const RowActions: React.FC<RowActionsProps> = ({
                     <Icon name="save" className="w-4 h-4" />
                 </button>
             )}
-            {!isNew && (
+            {!isNew && onEdit && (
                 <button 
                     onClick={onEdit}
                     className="p-2 rounded-md hover:bg-accent/10 text-slate-400 hover:text-accent transition-colors"
@@ -39,13 +39,15 @@ export const RowActions: React.FC<RowActionsProps> = ({
                     <Icon name="edit" className="w-4 h-4" />
                 </button>
             )}
-            <button 
-                onClick={onDelete}
-                className="p-2 rounded-md hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors"
-                title={isNew ? t('common.cancel') : t('common.delete')}
-            >
-                <Icon name={isNew ? "x" : "trash-2"} className="w-4 h-4" />
-            </button>
+            {onDelete && (
+                <button 
+                    onClick={onDelete}
+                    className="p-2 rounded-md hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors"
+                    title={isNew ? t('common.cancel') : t('common.delete')}
+                >
+                    <Icon name={isNew ? "x" : "trash-2"} className="w-4 h-4" />
+                </button>
+            )}
         </div>
     );
 };

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useCRMStore } from '../store/useStore';
+import { usePermissions } from '../hooks/usePermissions';
 import { Dashboard } from '../components/Dashboard';
 import { DataTable } from '../components/datatable/DataTable';
 import { DynamicForm } from '../components/DynamicForm';
@@ -8,7 +9,7 @@ import { UsagePage } from '../components/UsagePage';
 import { Settings } from '../components/Settings';
 import MediaPage from '../pages/MediaPage';
 
-const viewMap: Record<string, React.ComponentType> = {
+const viewMap: Record<string, React.ComponentType<any>> = {
     'dashboard': Dashboard,
     'list': DataTable,
     'usage': UsagePage,
@@ -18,6 +19,7 @@ const viewMap: Record<string, React.ComponentType> = {
 
 export const AppRoutes: React.FC = () => {
     const { routes } = useCRMStore();
+    const { hasPermission } = usePermissions();
 
     if (!routes) {
         return (
@@ -45,6 +47,21 @@ export const AppRoutes: React.FC = () => {
                     const Component = viewMap[route.view] || Dashboard;
                     const entity = route.path.substring(1); // e.g., "products" from "/products"
                     
+                    // Determine module name for permission check
+                    // Usually the entity name, but we can map it if needed
+                    const moduleName = entity;
+                    
+                    // Check if user has permission for this module
+                    const canRead = !moduleName || hasPermission(moduleName, 'read');
+
+                    if (!canRead) {
+                        return (
+                            <React.Fragment key={route.path}>
+                                <Route path={route.path} element={<Navigate to={defaultPath} replace />} />
+                            </React.Fragment>
+                        );
+                    }
+
                     return (
                         <React.Fragment key={route.path}>
                             <Route path={route.path} element={<Component entity={entity} />} />
@@ -52,8 +69,14 @@ export const AppRoutes: React.FC = () => {
                             {/* Handle sub-routes for list view (Add/Edit) */}
                             {route.view === 'list' && (
                                 <>
-                                    <Route path={`${route.path}/add`} element={<DynamicForm entity={entity} />} />
-                                    <Route path={`${route.path}/edit/:id`} element={<DynamicForm entity={entity} />} />
+                                    <Route 
+                                        path={`${route.path}/add`} 
+                                        element={hasPermission(moduleName, 'write') ? <DynamicForm entity={entity} /> : <Navigate to={route.path} replace />} 
+                                    />
+                                    <Route 
+                                        path={`${route.path}/edit/:id`} 
+                                        element={hasPermission(moduleName, 'write') ? <DynamicForm entity={entity} /> : <Navigate to={route.path} replace />} 
+                                    />
                                 </>
                             )}
                         </React.Fragment>

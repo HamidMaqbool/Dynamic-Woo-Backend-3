@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 // Import individual input components
 import { TextField } from './input-type/TextField';
 import { TextAreaField } from './input-type/TextAreaField';
-import { SelectField } from './input-type/SelectField';
+import { DynamicSelectField } from './input-type/DynamicSelectField';
 import { CheckboxField } from './input-type/CheckboxField';
 import { RadioField } from './input-type/RadioField';
 import { ImageField } from './input-type/ImageField';
@@ -21,6 +21,7 @@ import { GalleryField } from './input-type/GalleryField';
 import { ColorField } from './input-type/ColorField';
 import { RepeaterField } from './input-type/RepeaterField';
 import { VariationField } from './input-type/VariationField';
+import { PermissionsGrid } from './input-type/PermissionsGrid';
 
 interface DynamicFormProps {
     entity: string;
@@ -142,14 +143,12 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ entity }) => {
                 await updateItem(entity, id, formData);
             } else {
                 // For new items, we might need some defaults if not provided
-                const newItem = {
-                    ...formData,
-                    status: formData.status || 'publish',
-                };
+                const newItem = { ...formData };
                 
                 // Add entity-specific defaults if needed
                 if (entity === 'auroparts-product') {
                     Object.assign(newItem, {
+                        status: formData.status || 'publish',
                         product_type: formData.product_type || 'simple',
                         image: formData.image || 'https://picsum.photos/seed/new/100/100',
                         identifier: formData.identifier || `AURO-${Math.floor(Math.random() * 10000)}`,
@@ -203,11 +202,13 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ entity }) => {
                 );
             case 'select':
             case 'status':
+            case 'dynamic-select':
                 return (
-                    <SelectField 
+                    <DynamicSelectField 
                         value={value ?? ''}
                         onChange={onChange}
                         options={field.options}
+                        dataSource={field.dataSource}
                         hasError={hasError}
                         readOnly={readOnly}
                     />
@@ -275,6 +276,14 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ entity }) => {
                         onChange={onChange}
                         readOnly={readOnly}
                         columns={field.columns}
+                    />
+                );
+            case 'permissions-grid':
+                return (
+                    <PermissionsGrid 
+                        value={value || {}}
+                        onChange={onChange}
+                        readOnly={readOnly}
                     />
                 );
             default:

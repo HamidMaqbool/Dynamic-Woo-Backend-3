@@ -12,6 +12,18 @@
     "icon": "package"
   },
   {
+    "path": "/users",
+    "view": "list",
+    "title": "Users",
+    "icon": "users"
+  },
+  {
+    "path": "/user-roles",
+    "view": "list",
+    "title": "Roles",
+    "icon": "shield"
+  },
+  {
     "path": "/usage",
     "view": "usage",
     "title": "Usage Guide",

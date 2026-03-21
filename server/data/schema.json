@@ -56,15 +56,44 @@
             }
         },
         "users": {
+            "dropdown": [
+                { "label": "Delete All", "action": "delete-all" },
+                { "label": "Admins", "action": "admins" },
+                { "label": "Users", "action": "users" }
+            ],
             "label": { "singular": "User", "plural": "Users" },
+            "tabs": [
+                { "label": "Users", "route": "users.index", "var": ["type"] },
+                { "label": "Edit User", "route": "user.form", "var": ["type", "id"] }
+            ],
             "table": {
+                "type": "main",
+                "updateMode": "manual",
+                "paginationPerPage": 10,
+                "paginationList": [10, 20, 50, 100],
                 "cols": [
-                    { "name": "ID", "col": "id", "required": true },
-                    { "name": "Name", "col": "name", "required": true, "searchable": true },
-                    { "name": "Email", "col": "email", "unique": true, "required": true, "searchable": true },
-                    { "name": "Password", "col": "password", "required": true },
-                    { "name": "Role", "col": "role", "required": true },
-                    { "name": "Created At", "col": "created_at", "type": "date" }
+                    { "name": "ID", "sortable": true, "col": "id", "searchable": true, "width": "80px", "responsive": "show" },
+                    { "name": "Name", "sortable": true, "col": "name", "searchable": true, "width": "200px", "responsive": "show" },
+                    { "name": "Email", "sortable": true, "col": "email", "searchable": true, "width": "250px", "responsive": "show" },
+                    { "name": "Role", "sortable": true, "col": "role", "type": "badge", "width": "120px", "responsive": "show" },
+                    { "name": "Created Date", "sortable": true, "col": "created_at", "width": "150px", "responsive": "hide" },
+                    { "name": "Action", "sortable": true, "col": ["edit", "delete"], "type": "action", "width": "150px", "responsive": "expandable" }
+                ]
+            }
+        },
+        "user-roles": {
+            "label": { "singular": "Role", "plural": "Roles" },
+            "table": {
+                "type": "main",
+                "updateMode": "manual",
+                "paginationPerPage": 10,
+                "paginationList": [10, 20, 50, 100],
+                "cols": [
+                    { "name": "ID", "sortable": true, "col": "id", "searchable": true, "width": "80px", "responsive": "show" },
+                    { "name": "Role Name", "sortable": true, "col": "name", "searchable": true, "width": "200px", "responsive": "show" },
+                    { "name": "Description", "sortable": true, "col": "description", "searchable": true, "width": "300px", "responsive": "expandable" },
+                    { "name": "Created Date", "sortable": true, "col": "created_at", "width": "150px", "responsive": "hide" },
+                    { "name": "Action", "sortable": true, "col": ["edit", "delete"], "type": "action", "width": "150px", "responsive": "expandable" }
                 ]
             }
         }
@@ -160,6 +189,58 @@
                             { "name": "inventory", "label": "Inventory", "type": "number" },
                             { "name": "comment", "label": "Comment", "type": "text" }
                         ]
+                    }
+                ]
+            }
+        ],
+        "users": [
+            {
+                "title": "User Status",
+                "type": "sidebar",
+                "name": "save",
+                "fields": [
+                    {
+                        "title": "Role",
+                        "name": "role",
+                        "value": "user",
+                        "type": "dynamic-select",
+                        "dataSource": "/api/roles/list",
+                        "options": [
+                            { "value": "admin", "label": "Admin" }
+                        ],
+                        "field-type":"main",
+                        "dbcol":"role"
+                    }
+                ]
+            },
+            {
+                "title": "User Information",
+                "name": "user-info",
+                "fields": [
+                    { "title": "Full Name", "name": "name", "type": "text", "valid": "required", "field-type":"main", "dbcol":"name" },
+                    { "title": "Email Address", "name": "email", "type": "email", "valid": "required|email", "field-type":"main", "dbcol":"email" },
+                    { "title": "Password", "name": "password", "type": "password", "placeholder": "Leave blank to keep current", "field-type":"main", "dbcol":"password" }
+                ]
+            }
+        ],
+        "user-roles": [
+            {
+                "title": "Role Details",
+                "name": "role-details",
+                "fields": [
+                    { "title": "Role Name", "name": "name", "type": "text", "valid": "required", "field-type":"main", "dbcol":"name" },
+                    { "title": "Description", "name": "description", "type": "text", "field-type":"main", "dbcol":"description" }
+                ]
+            },
+            {
+                "title": "Permissions & Menu Access",
+                "name": "access_control",
+                "fields": [
+                    {
+                        "title": "Access Configuration",
+                        "name": "access_config",
+                        "type": "permissions-grid",
+                        "class": "full"
                     }
                 ]
             }

@@ -15,8 +15,8 @@ interface DataTableCellProps {
     statusOptions: { value: string; label: string }[];
     onLocalChange: (itemId: string, fieldName: string, value: any, autoUpdate?: boolean) => void;
     onManualUpdate: (itemId: string) => void;
-    onDelete: (itemId: string) => void;
-    onEdit: (itemId: string) => void;
+    onDelete?: (itemId: string) => void;
+    onEdit?: (itemId: string) => void;
     hasChanges: boolean;
 }
 

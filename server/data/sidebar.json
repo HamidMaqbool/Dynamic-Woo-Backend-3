@@ -2,25 +2,36 @@
   {
     "title": "Dashboard",
     "icon": "layout",
-    "path": "dashboard"
+    "path": "dashboard",
+    "module": "dashboard"
+  },
+  {
+    "title": "Orders",
+    "icon": "shopping-cart",
+    "path": "orders",
+    "module": "orders"
   },
   {
     "title": "Products",
     "icon": "package",
     "path": "my-products",
+    "module": "products",
     "children": [
       {
         "title": "All Products",
-        "path": "products"
+        "path": "products",
+        "icon": "list"
       },
        
       {
         "title": "Add New",
-        "path": "my-products/add"
+        "path": "my-products/add",
+        "icon": "plus-circle"
       },
       {
         "title": "Categories",
-        "path": "my-products"
+        "path": "my-products",
+        "icon": "tag"
       }
     ]
   },
@@ -28,21 +39,60 @@
     "title": "Customers",
     "icon": "users",
     "path": "customers",
+    "module": "customers",
     "children": [
       {
         "title": "All Customers",
-        "path": "customers/all"
+        "path": "customers/all",
+        "icon": "users"
       },
       {
         "title": "Segments",
-        "path": "customers/segments"
+        "path": "customers/segments",
+        "icon": "user-check"
+      }
+    ]
+  },
+  {
+    "title": "Users",
+    "icon": "user-cog",
+    "path": "users",
+    "module": "users",
+    "children": [
+      {
+        "title": "All Users",
+        "path": "users",
+        "icon": "users"
+      },
+      {
+        "title": "Add New",
+        "path": "users/add",
+        "icon": "user-plus"
+      },
+      {
+        "title": "Roles",
+        "path": "user-roles",
+        "icon": "shield-check"
       }
     ]
   },
   {
     "title": "Media",
     "icon": "image",
-    "path": "media"
+    "path": "media",
+    "module": "media"
+  },
+  {
+    "title": "Inventory",
+    "icon": "box",
+    "path": "inventory",
+    "module": "inventory"
+  },
+  {
+    "title": "Reports",
+    "icon": "bar-chart",
+    "path": "reports",
+    "module": "reports"
   },
   {
     "title": "Usage Guide",

@@ -142,4 +142,97 @@ class GenericApiController extends Controller
 
         return response()->json(['success' => true, 'message' => count($ids) . ' items deleted']);
     }
+
+    public function health()
+    {
+        try {
+            $tables = DB::select("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'");
+            return response()->json([
+                'status' => 'ok',
+                'tables' => array_map(fn($r) => $r->table_name, $tables)
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function sidebar()
+    {
+        // In Laravel, you'd typically store these in resources/data or storage/app
+        $path = resource_path('data/sidebar.json');
+        if (!file_exists($path)) return response()->json(['message' => 'Not found'], 404);
+        return response()->json(json_decode(file_get_contents($path), true));
+    }
+
+    public function dashboard()
+    {
+        $path = resource_path('data/dashboard.json');
+        if (!file_exists($path)) return response()->json(['message' => 'Not found'], 404);
+        return response()->json(json_decode(file_get_contents($path), true));
+    }
+
+    public function schema()
+    {
+        $path = resource_path('data/schema.json');
+        if (!file_exists($path)) return response()->json(['message' => 'Not found'], 404);
+        return response()->json(json_decode(file_get_contents($path), true));
+    }
+
+    public function routes()
+    {
+        $path = resource_path('data/routes.json');
+        if (!file_exists($path)) return response()->json(['message' => 'Not found'], 404);
+        return response()->json(json_decode(file_get_contents($path), true));
+    }
+
+    public function settings()
+    {
+        $settings = DB::table('settings')->where('key', 'app_settings')->first();
+        if ($settings) {
+            return response()->json(json_decode($settings->value, true));
+        }
+
+        // Fallback to file
+        $path = resource_path('data/settings.json');
+        if (!file_exists($path)) return response()->json(['message' => 'Not found'], 404);
+        return response()->json(json_decode(file_get_contents($path), true));
+    }
+
+    public function updateSettings(Request $request)
+    {
+        $data = $request->all();
+        DB::table('settings')->updateOrInsert(
+            ['key' => 'app_settings'],
+            [
+                'id' => 'SET-' . time(),
+                'value' => json_encode($data),
+                'updated_at' => now()
+            ]
+        );
+        return response()->json($data);
+    }
+
+    public function login(Request $request)
+    {
+        $credentials = $request->only('email', 'password');
+        $user = DB::table('users')->where('email', $credentials['email'])->first();
+
+        if ($user && Hash::check($credentials['password'], $user->password)) {
+            // In a real Laravel app with Sanctum, you'd do:
+            // $token = $user->createToken('auth_token')->plainTextToken;
+            $token = "auro-parts-secret-token-123"; // Mocking your Node.js token
+            
+            return response()->json([
+                'success' => true,
+                'user' => [
+                    'email' => $user->email,
+                    'name' => $user->name,
+                    'role' => $user->role
+                ],
+                'token' => $token
+            ]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Invalid email or password'], 401);
+    }
 }

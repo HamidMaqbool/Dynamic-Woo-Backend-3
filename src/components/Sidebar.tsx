@@ -92,8 +92,9 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ item, closeMobile, isCollapse
                 key={idx}
                 to={getRoutePath(child.path)}
                 onClick={closeMobile}
-                className="w-full block text-left px-3 py-2 text-xs font-medium text-slate-400 hover:text-accent hover:bg-slate-700/50 rounded-lg transition-all"
+                className="w-full flex items-center gap-3 px-3 py-2 text-xs font-medium text-slate-400 hover:text-accent hover:bg-slate-700/50 rounded-lg transition-all"
               >
+                {child.icon && <Icon name={child.icon} className="w-3.5 h-3.5" />}
                 {t(`common.${child.title.toLowerCase().replace(/\s+/g, '_')}`, child.title)}
               </Link>
             ))}
@@ -115,8 +116,9 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ item, closeMobile, isCollapse
                 key={idx}
                 to={getRoutePath(child.path)}
                 onClick={closeMobile}
-                className="w-full block text-left px-4 py-2 text-xs font-medium text-slate-500 hover:text-accent transition-colors"
+                className="w-full flex items-center gap-3 px-4 py-2 text-xs font-medium text-slate-500 hover:text-accent transition-colors"
               >
+                {child.icon && <Icon name={child.icon} className="w-3.5 h-3.5" />}
                 {t(`common.${child.title.toLowerCase().replace(/\s+/g, '_')}`, child.title)}
               </Link>
             ))}
@@ -169,55 +171,72 @@ export const Sidebar: React.FC = () => {
         }
     }, [settingsData]);
 
-    const SidebarContent = ({ collapsed = false }: { collapsed?: boolean }) => (
-        <div className="flex flex-col h-full bg-slate-900 text-slate-300 border-r border-slate-800">
-            {/* Logo */}
-            <div className={cn("p-8 border-b border-slate-800", collapsed && "p-4 flex justify-center")}>
-                <Link to="/dashboard" className="flex items-center gap-3">
-                    {collapsed ? (
-                        logos.collapsed ? (
-                            <img src={logos.collapsed} alt="Logo" className="w-9 h-9 object-contain" referrerPolicy="no-referrer" />
-                        ) : (
-                            <div className="w-9 h-9 bg-accent rounded-xl flex items-center justify-center shadow-lg shadow-accent/20 shrink-0">
-                                <Icon name="package" className="w-5 h-5 text-white" />
-                            </div>
-                        )
-                    ) : (
-                        <>
-                            {logos.big ? (
-                                <img src={logos.big} alt="Logo" className="h-9 object-contain" referrerPolicy="no-referrer" />
-                            ) : (
-                                <>
-                                    <div className="w-9 h-9 bg-accent rounded-xl flex items-center justify-center shadow-lg shadow-accent/20 shrink-0">
-                                        <Icon name="package" className="w-5 h-5 text-white" />
-                                    </div>
-                                    <span className="text-xl font-bold tracking-tight text-white">AURO<span className="text-accent">CRM</span></span>
-                                </>
-                            )}
-                        </>
-                    )}
-                </Link>
-            </div>
+    const SidebarContent = ({ collapsed = false }: { collapsed?: boolean }) => {
+        const filteredSidebarData = sidebarData.filter(item => {
+            if (!user) return false;
+            if (user.role === 'admin') return true;
+            
+            // If accessibleMenus is defined, only show items in that list
+            if (user.accessibleMenus && user.accessibleMenus.length > 0) {
+                const isAccessible = user.accessibleMenus.some(m => m.path === item.path);
+                if (!isAccessible) return false;
+            }
 
-            {/* Nav */}
-            <nav className={cn(
-                "flex-1 p-6 space-y-2 custom-scrollbar", 
-                collapsed ? "p-2 overflow-y-visible" : "overflow-y-auto",
-                collapsed && "flex flex-col items-center"
-            )}>
-                {isSidebarLoading ? (
-                    <SidebarSkeleton />
-                ) : (
-                    sidebarData.map((item, idx) => (
-                        <SidebarItem 
-                          key={idx} 
-                          item={item} 
-                          closeMobile={() => setIsOpen(false)} 
-                          isCollapsed={collapsed}
-                        />
-                    ))
-                )}
-            </nav>
+            if (!item.module) return true; // Always show items without a module (like Usage Guide)
+            
+            const permission = user.permissions?.find(p => p.module === item.module);
+            return permission && permission.access !== 'none';
+        });
+
+        return (
+            <div className="flex flex-col h-full bg-slate-900 text-slate-300 border-r border-slate-800">
+                {/* Logo */}
+                <div className={cn("p-8 border-b border-slate-800", collapsed && "p-4 flex justify-center")}>
+                    <Link to="/dashboard" className="flex items-center gap-3">
+                        {collapsed ? (
+                            logos.collapsed ? (
+                                <img src={logos.collapsed} alt="Logo" className="w-9 h-9 object-contain" referrerPolicy="no-referrer" />
+                            ) : (
+                                <div className="w-9 h-9 bg-accent rounded-xl flex items-center justify-center shadow-lg shadow-accent/20 shrink-0">
+                                    <Icon name="package" className="w-5 h-5 text-white" />
+                                </div>
+                            )
+                        ) : (
+                            <>
+                                {logos.big ? (
+                                    <img src={logos.big} alt="Logo" className="h-9 object-contain" referrerPolicy="no-referrer" />
+                                ) : (
+                                    <>
+                                        <div className="w-9 h-9 bg-accent rounded-xl flex items-center justify-center shadow-lg shadow-accent/20 shrink-0">
+                                            <Icon name="package" className="w-5 h-5 text-white" />
+                                        </div>
+                                        <span className="text-xl font-bold tracking-tight text-white">AURO<span className="text-accent">CRM</span></span>
+                                    </>
+                                )}
+                            </>
+                        )}
+                    </Link>
+                </div>
+
+                {/* Nav */}
+                <nav className={cn(
+                    "flex-1 p-6 space-y-2 custom-scrollbar", 
+                    collapsed ? "p-2 overflow-y-visible" : "overflow-y-auto",
+                    collapsed && "flex flex-col items-center"
+                )}>
+                    {isSidebarLoading ? (
+                        <SidebarSkeleton />
+                    ) : (
+                        filteredSidebarData.map((item, idx) => (
+                            <SidebarItem 
+                              key={idx} 
+                              item={item} 
+                              closeMobile={() => setIsOpen(false)} 
+                              isCollapsed={collapsed}
+                            />
+                        ))
+                    )}
+                </nav>
 
            
 
@@ -263,6 +282,7 @@ export const Sidebar: React.FC = () => {
             </div>
         </div>
     );
+};
 
     return (
         <>
