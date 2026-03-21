@@ -5,8 +5,17 @@ interface FetchOptions extends RequestInit {
     params?: Record<string, string>;
 }
 
+declare global {
+    interface Window {
+        APP_CONFIG: {
+            API_BASE_URL: string;
+        };
+    }
+}
+
 export async function apiFetch(url: string, options: FetchOptions = {}) {
     const { token, logout, setNotification } = useCRMStore.getState();
+    const API_BASE_URL = window.APP_CONFIG?.API_BASE_URL || '';
 
     const headers = new Headers(options.headers || {});
     if (token) {
@@ -16,10 +25,10 @@ export async function apiFetch(url: string, options: FetchOptions = {}) {
         headers.set('Content-Type', 'application/json');
     }
 
-    let fullUrl = url;
+    let fullUrl = `${API_BASE_URL}${url}`;
     if (options.params) {
         const searchParams = new URLSearchParams(options.params);
-        fullUrl += `?${searchParams.toString()}`;
+        fullUrl += (fullUrl.includes('?') ? '&' : '?') + searchParams.toString();
     }
 
     try {
