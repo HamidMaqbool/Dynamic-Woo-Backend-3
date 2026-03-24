@@ -15,7 +15,9 @@ declare global {
 
 export async function apiFetch(url: string, options: FetchOptions = {}) {
     const { token, logout, setNotification } = useCRMStore.getState();
-    const API_BASE_URL = window.APP_CONFIG?.API_BASE_URL || '';
+    const baseUrl = (window.APP_CONFIG?.API_BASE_URL || '').replace(/\/$/, '');
+    const cleanUrl = url.startsWith('/') ? url : `/${url}`;
+    let fullUrl = `${baseUrl}${cleanUrl}`;
 
     const headers = new Headers(options.headers || {});
     if (token) {
@@ -24,8 +26,6 @@ export async function apiFetch(url: string, options: FetchOptions = {}) {
     if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
         headers.set('Content-Type', 'application/json');
     }
-
-    let fullUrl = `${API_BASE_URL}${url}`;
     if (options.params) {
         const searchParams = new URLSearchParams(options.params);
         fullUrl += (fullUrl.includes('?') ? '&' : '?') + searchParams.toString();

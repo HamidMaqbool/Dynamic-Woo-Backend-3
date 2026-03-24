@@ -345,12 +345,11 @@ export const useCRMStore = create<CRMState>((set, get) => ({
     login: async (email, password) => {
         set({ isLoading: true });
         try {
-            const response = await fetch('/api/login', {
+            const data = await apiFetch('/api/login', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
             });
-            const data = await response.json();
+            
             if (data.success) {
                 localStorage.setItem('crm-token', data.token);
                 localStorage.setItem('crm-user', JSON.stringify(data.user));
@@ -369,7 +368,7 @@ export const useCRMStore = create<CRMState>((set, get) => ({
         } catch (error) {
             console.error("Login error", error);
             set({ isLoading: false });
-            get().addNotification('An error occurred during login', 'error');
+            get().addNotification(error instanceof Error ? error.message : 'An error occurred during login', 'error');
             return false;
         }
     },
