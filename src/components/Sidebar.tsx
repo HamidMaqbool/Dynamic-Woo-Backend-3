@@ -188,6 +188,7 @@ export const Sidebar: React.FC = () => {
             return permission && permission.access !== 'none';
         });
 
+  
         return (
             <div className="flex flex-col h-full bg-slate-900 text-slate-300 border-r border-slate-800">
                 {/* Logo */}

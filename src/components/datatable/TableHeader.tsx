@@ -14,7 +14,7 @@ interface TableHeaderProps {
 export const TableHeader: React.FC<TableHeaderProps> = ({ 
     title, 
     description, 
-    onAddRow, 
+ 
     onAddProduct, 
     addProductLabel 
 }) => {
@@ -30,13 +30,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                 </p>
             </div>
             <div className="flex items-center gap-3 w-full sm:w-auto">
-                <button 
-                    onClick={onAddRow}
-                    className="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 shadow-sm transition-all active:scale-[0.98] text-sm font-semibold w-full sm:w-auto"
-                >
-                    <Icon name="plus" className="w-4 h-4" />
-                    <span>{t('datatable.addRow')}</span>
-                </button>
+              
                 <button 
                     onClick={onAddProduct}
                     className="flex items-center justify-center gap-2 px-4 py-2 bg-accent text-white rounded-lg hover:opacity-90 shadow-sm shadow-accent/20 transition-all active:scale-[0.98] text-sm font-semibold w-full sm:w-auto"

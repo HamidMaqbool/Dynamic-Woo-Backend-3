@@ -24,23 +24,22 @@ export const DataTable: React.FC<DataTableProps> = ({ entity = 'products' }) => 
     const navigate = useNavigate();
     const { hasPermission } = usePermissions();
     const canWrite = hasPermission(entity, 'write');
-    const { 
-        items, 
+    const {
+        items,
         isLoading,
         schema,
         routes,
         fetchData,
-        currentPage, 
-        itemsPerPage, 
+        currentPage,
+        itemsPerPage,
         totalItems,
         totalPages,
-        searchQuery, 
+        searchQuery,
         filters,
-        setCurrentPage, 
-        setItemsPerPage, 
+        setCurrentPage,
+        setItemsPerPage,
         setSearchQuery,
         setFilters,
-        addItem,
         updateItem,
         deleteItem,
         bulkDeleteItems,
@@ -49,7 +48,10 @@ export const DataTable: React.FC<DataTableProps> = ({ entity = 'products' }) => 
     } = useCRMStore();
 
     const [localChanges, setLocalChanges] = useState<Record<string, any>>({});
-    const [newRows, setNewRows] = useState<any[]>([]);
+    const [table, setTable] = useState<Record<string, any>>({});
+    const [initialCols, setInitialCols] = useState<Record<string, any>>([]);
+    const [visibleColumns, setVisibleColumns] = useState<string[]>([]);
+
 
     const listRoute = routes?.find(r => r.path.substring(1) === entity);
     const basePath = listRoute?.path || `/${entity}`;
@@ -60,55 +62,51 @@ export const DataTable: React.FC<DataTableProps> = ({ entity = 'products' }) => 
         isBulk: false
     });
 
-    const tableKey = Object.keys(schema?.table || {}).find(key => key.includes(entity)) || "auroparts-product";
-    const tableConfig = schema?.table[tableKey]?.table;
-    const initialCols = tableConfig?.cols || [];
-    const [visibleColumns, setVisibleColumns] = useState<string[]>(initialCols.map((c: any) => c.name));
+
+
+    useEffect(() => {
+        if (schema) {
+            const foundTable = schema.find((s: any) => s.entity === entity);
+            setTable(foundTable || {});
+            setInitialCols(foundTable?.columns || []);
+            // setVisibleColumns(foundTable?.columns.map((c: any) => c.name) || []);
+            setVisibleColumns(foundTable?.columns.map((c: any) => c.name) || []);
+        }
+    }, [schema, entity]);
+
+
 
     useEffect(() => {
         fetchData(entity);
     }, [fetchData, entity, currentPage, itemsPerPage, searchQuery, filters]);
 
-    if (!schema || !tableConfig) {
+    if (!schema || !table) {
         return <TableSkeleton />;
     }
 
-    const updateMode = tableConfig.updateMode || 'auto';
-    const cols = initialCols.filter((c: any) => visibleColumns.includes(c.name));
+    
 
     const toggleColumn = (name: string) => {
-        setVisibleColumns(prev => 
-            prev.includes(name) 
-                ? prev.filter(n => n !== name) 
+        setVisibleColumns(prev =>
+            prev.includes(name)
+                ? prev.filter(n => n !== name)
                 : [...prev, name]
         );
     };
 
     // Get filter options from schema
-    const formKey = Object.keys(schema?.form || {}).find(key => key.includes(entity)) || "auroparts-product";
-    const statusOptions = (schema.form[formKey][0].fields.find((f: any) => f.name === 'status') as any)?.options || [];
 
-    const handleAddRow = () => {
-        const newRow: any = {
-            id: `NEW-${Date.now()}`,
-            image: 'https://picsum.photos/seed/new/100/100',
-            identifier: `AURO-${Math.floor(Math.random() * 10000)}`,
-            parent_id: '-',
-            title: '',
-            product_type: 'simple',
-            status: 'draft',
-            created_at: new Date().toISOString().split('T')[0]
-        };
-        setNewRows(prev => [newRow, ...prev]);
-        setLocalChanges(prev => ({
-            ...prev,
-            [newRow.id]: { ...newRow }
-        }));
-    };
+
+    const statusOptions = [];
+
+
+
 
     const handleLocalChange = (itemId: string, field: string, value: any, autoUpdate?: boolean) => {
-        const isNew = itemId.startsWith('NEW-');
-        
+
+
+
+
         // Update local state first
         setLocalChanges(prev => ({
             ...prev,
@@ -118,12 +116,13 @@ export const DataTable: React.FC<DataTableProps> = ({ entity = 'products' }) => 
             }
         }));
 
+
         // If autoUpdate is true or global updateMode is auto, and it's not a new row, trigger the store update
-        if ((autoUpdate || updateMode === 'auto') && !isNew) {
+        if ((autoUpdate)) {
             updateItem(entity, itemId, { [field]: value });
-            
+
             // If it was an auto-update, we can clear the local change for this specific field
-            if (autoUpdate || updateMode === 'auto') {
+            if (autoUpdate) {
                 setLocalChanges(prev => {
                     const next = { ...prev };
                     if (next[itemId]) {
@@ -143,14 +142,10 @@ export const DataTable: React.FC<DataTableProps> = ({ entity = 'products' }) => 
     const handleManualUpdate = async (itemId: string) => {
         const changes = localChanges[itemId];
         if (changes) {
-            if (itemId.startsWith('NEW-')) {
-                const { id, ...itemData } = changes;
-                await addItem(entity, itemData);
-                setNewRows(prev => prev.filter(r => r.id !== itemId));
-            } else {
-                await updateItem(entity, itemId, changes);
-            }
-            
+
+
+            await updateItem(entity, itemId, changes);
+
             setLocalChanges(prev => {
                 const next = { ...prev };
                 delete next[itemId];
@@ -176,15 +171,7 @@ export const DataTable: React.FC<DataTableProps> = ({ entity = 'products' }) => 
     };
 
     const handleDelete = (id: string) => {
-        if (id.startsWith('NEW-')) {
-            setNewRows(prev => prev.filter(r => r.id !== id));
-            setLocalChanges(prev => {
-                const next = { ...prev };
-                delete next[id];
-                return next;
-            });
-            return;
-        }
+
         setDeleteModal({ isOpen: true, id, isBulk: false });
     };
 
@@ -200,21 +187,22 @@ export const DataTable: React.FC<DataTableProps> = ({ entity = 'products' }) => 
         }
     };
 
-    const allRows = [...newRows, ...items];
+    const allRows = [...items];
 
+    
+    
     return (
         <div className="flex flex-col h-full bg-[#F8F9FA] text-[#1A1A1A] font-sans">
             {/* Header Controls */}
             <div className="bg-white border-b border-slate-200 px-4 py-4 sm:px-8 sm:py-6 flex flex-col gap-6">
-                <TableHeader 
-                    title={schema.table[tableKey].label.plural}
+                <TableHeader
+                    title={table.labels?.plural}
                     description={t(`${entity}.manageDescription`)}
-                    onAddRow={canWrite ? handleAddRow : undefined}
                     onAddProduct={canWrite ? () => navigate(`${basePath}/add`) : undefined}
-                    addProductLabel={schema.table[tableKey].label.singular}
+                    addProductLabel={table.labels?.singular}
                 />
 
-                <TableFilters 
+                <TableFilters
                     searchQuery={searchQuery}
                     onSearchChange={setSearchQuery}
                     status={filters.status}
@@ -235,7 +223,7 @@ export const DataTable: React.FC<DataTableProps> = ({ entity = 'products' }) => 
             {/* Bulk Actions Bar */}
             <AnimatePresence>
                 {selectedIds.length > 0 && (
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
@@ -248,19 +236,19 @@ export const DataTable: React.FC<DataTableProps> = ({ entity = 'products' }) => 
                                 </div>
                                 <span className="text-sm font-bold uppercase tracking-wider">{t('datatable.itemsSelected', { count: selectedIds.length })}</span>
                             </div>
-                            
+
                             <div className="h-6 w-px bg-white/20" />
-                            
+
                             <div className="flex items-center gap-4">
-                                <button 
+                                <button
                                     onClick={handleBulkDelete}
                                     className="flex items-center gap-2 px-4 py-2 rounded-lg bg-rose-500/20 hover:bg-rose-500/40 text-xs font-bold transition-all border border-rose-400/30"
                                 >
                                     <Icon name="trash-2" className="w-4 h-4" />
                                     {t('common.delete')}
                                 </button>
-                                
-                                <button 
+
+                                <button
                                     className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-bold transition-all border border-white/10"
                                 >
                                     <Icon name="edit" className="w-4 h-4" />
@@ -268,8 +256,8 @@ export const DataTable: React.FC<DataTableProps> = ({ entity = 'products' }) => 
                                 </button>
                             </div>
                         </div>
-                        
-                        <button 
+
+                        <button
                             onClick={() => setSelectedIds([])}
                             className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white/10 text-xs font-bold transition-all"
                         >
@@ -285,7 +273,7 @@ export const DataTable: React.FC<DataTableProps> = ({ entity = 'products' }) => 
                 {/* Loading Overlay */}
                 <AnimatePresence>
                     {isLoading && items.length > 0 && (
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
@@ -312,8 +300,8 @@ export const DataTable: React.FC<DataTableProps> = ({ entity = 'products' }) => 
                                     <tr className="bg-slate-50/50 border-b border-slate-200">
                                         <th className="pl-8 pr-4 py-4 w-10">
                                             <label className="relative flex items-center justify-center cursor-pointer group select-none">
-                                                <input 
-                                                    type="checkbox" 
+                                                <input
+                                                    type="checkbox"
                                                     checked={selectedIds.length === items.length && items.length > 0}
                                                     onChange={toggleSelectAll}
                                                     className="peer sr-only"
@@ -324,14 +312,14 @@ export const DataTable: React.FC<DataTableProps> = ({ entity = 'products' }) => 
                                                     "peer-checked:border-accent",
                                                     "group-hover:border-accent/60"
                                                 )}></div>
-                                                <svg 
+                                                <svg
                                                     className={cn(
                                                         "absolute w-3.5 h-3.5 text-accent transition-all duration-200 ease-in-out transform",
                                                         "opacity-0 scale-50",
                                                         "peer-checked:opacity-100 peer-checked:scale-100"
-                                                    )} 
-                                                    fill="none" 
-                                                    stroke="currentColor" 
+                                                    )}
+                                                    fill="none"
+                                                    stroke="currentColor"
                                                     viewBox="0 0 24 24"
                                                 >
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3.5" d="M5 13l4 4L19 7" />
@@ -339,12 +327,12 @@ export const DataTable: React.FC<DataTableProps> = ({ entity = 'products' }) => 
                                             </label>
                                         </th>
                                         {/* Expand Button Header (Mobile Only) */}
-                                        {cols.some((c: any) => c.responsive === 'expandable') && (
+                                        {visibleColumns.some((c: any) => c.responsive === 'expandable') && (
                                             <th className="px-4 py-4 w-10 md:hidden"></th>
                                         )}
-                                        {cols.map((col: any) => (
-                                            <th 
-                                                key={col.name} 
+                                        {initialCols.filter((col: any) => visibleColumns.includes(col.name)).map((col: any) => (
+                                            <th
+                                                key={col.name}
                                                 className={cn(
                                                     "px-6 py-4 text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider",
                                                     col.responsive === 'expandable' || col.responsive === 'hide' ? "hidden md:table-cell" : "table-cell"
@@ -358,10 +346,10 @@ export const DataTable: React.FC<DataTableProps> = ({ entity = 'products' }) => 
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
                                     {allRows.map((item) => (
-                                        <DataTableRow 
+                                        <DataTableRow
                                             key={item.id}
                                             item={item}
-                                            cols={cols}
+                                            cols={initialCols.filter((col: any) => visibleColumns.includes(col.name))}
                                             selectedIds={selectedIds}
                                             toggleSelect={toggleSelect}
                                             localChanges={localChanges}
@@ -374,7 +362,7 @@ export const DataTable: React.FC<DataTableProps> = ({ entity = 'products' }) => 
                                     ))}
                                     {allRows.length === 0 && (
                                         <tr>
-                                            <td colSpan={cols.length + 2} className="px-6 py-20 text-center">
+                                            <td colSpan={visibleColumns.length + 2} className="px-6 py-20 text-center">
                                                 <div className="flex flex-col items-center gap-3">
                                                     <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center">
                                                         <Icon name="info" className="w-6 h-6 text-slate-400" />
@@ -391,22 +379,22 @@ export const DataTable: React.FC<DataTableProps> = ({ entity = 'products' }) => 
                 </div>
             </div>
 
-            <TablePagination 
+            <TablePagination
                 itemsPerPage={itemsPerPage}
                 onItemsPerPageChange={setItemsPerPage}
-                paginationList={tableConfig.paginationList}
+                paginationList={table.pagination?.list}
                 currentPage={currentPage}
                 onPageChange={setCurrentPage}
                 totalItems={totalItems}
                 totalPages={totalPages}
             />
 
-            <ConfirmationModal 
+            <ConfirmationModal
                 isOpen={deleteModal.isOpen}
                 onClose={() => setDeleteModal({ ...deleteModal, isOpen: false })}
                 onConfirm={confirmDelete}
                 title={deleteModal.isBulk ? t('datatable.deleteSelected') : t('common.delete')}
-                message={deleteModal.isBulk 
+                message={deleteModal.isBulk
                     ? t('media.deleteConfirm')
                     : t(`${entity}.deleteConfirm`)
                 }

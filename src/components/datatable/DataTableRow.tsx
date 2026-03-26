@@ -33,7 +33,10 @@ export const DataTableRow: React.FC<DataTableRowProps> = ({
 }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const isSelected = selectedIds.includes(item.id);
-    const isNew = item.id.startsWith('NEW-');
+
+   
+    
+
 
     const expandableCols = cols.filter(col => col.responsive === 'expandable');
     const hasExpandable = expandableCols.length > 0;
@@ -46,7 +49,6 @@ export const DataTableRow: React.FC<DataTableRowProps> = ({
                 className={cn(
                     "hover:bg-slate-50/80 transition-colors group relative",
                     isSelected && "bg-accent/5",
-                    isNew && "bg-accent/5",
                     isExpanded && "bg-slate-50/80"
                 )}
             >
@@ -60,14 +62,14 @@ export const DataTableRow: React.FC<DataTableRowProps> = ({
                             checked={isSelected}
                             onChange={() => toggleSelect(item.id)}
                             className="peer sr-only"
-                            disabled={isNew}
+                          
                         />
                         <div className={cn(
                             "w-5 h-5 border-2 rounded-md transition-all duration-200 ease-in-out",
                             "border-slate-300 bg-white dark:bg-slate-800 dark:border-slate-600",
                             "peer-checked:border-accent",
                             "group-hover:border-accent/60",
-                            isNew && "opacity-30 cursor-not-allowed"
+                            
                         )}></div>
                         <svg 
                             className={cn(
@@ -115,7 +117,7 @@ export const DataTableRow: React.FC<DataTableRowProps> = ({
                         <DataTableCell 
                             col={col}
                             item={item}
-                            localValue={localChanges[item.id]?.[col.col as string]}
+                            localValue={localChanges[item.id]?.[col.name as string]}
                             statusOptions={statusOptions}
                             onLocalChange={handleLocalChange}
                             onManualUpdate={handleManualUpdate}

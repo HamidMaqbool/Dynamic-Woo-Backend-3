@@ -37,7 +37,7 @@ export const TablePagination: React.FC<TablePaginationProps> = ({
                         value={itemsPerPage}
                         onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
                     >
-                        {paginationList.map(num => (
+                        {paginationList && paginationList.map(num => (
                             <option key={num} value={num}>{num}</option>
                         ))}
                     </select>

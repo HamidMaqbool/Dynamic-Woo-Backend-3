@@ -33,15 +33,17 @@ export const DataTableCell: React.FC<DataTableCellProps> = ({
 }) => {
     const { t } = useTranslation();
     const itemId = item.id;
-    const fieldName = col.col as string;
+
+    const fieldName = col.name as string;
     const originalValue = item[fieldName];
     const value = localValue !== undefined ? localValue : originalValue;
-
+    
     const columnType = col.columnType || col.type;
     const isDisplayOnly = ['image', 'badge', 'action', 'manual_update'].includes(col.type);
     const effectiveType = columnType || (isDisplayOnly ? col.type : 'string');
 
     if (effectiveType === 'text') {
+       
         return (
             <TextColumn 
                 value={value as string}
@@ -77,7 +79,6 @@ export const DataTableCell: React.FC<DataTableCellProps> = ({
                 onDelete={() => onDelete(item.id)}
                 onUpdate={() => onManualUpdate(item.id)}
                 hasChanges={hasChanges}
-                isNew={itemId.startsWith('NEW-')}
             />
         );
     }
