@@ -5,10 +5,12 @@ import fs from "fs";
 import { Pool } from "pg";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
+import { MediaController, upload } from "./server/controllers/MediaController";
+import { SettingsController } from "./server/controllers/SettingsController";
 
 dotenv.config();
 
-const pool = new Pool({
+export const pool = new Pool({
   host: process.env.DB_HOST || 'localhost',
   port: parseInt(process.env.DB_PORT || "5432"),
   user: process.env.DB_USER || 'postgres',
@@ -113,6 +115,7 @@ function getPostgresType(type: string): string {
     case "images":
     case "repeater":
     case "variation":
+    case "permissions-grid":
       return "JSONB"; // Store complex types as JSONB
     default: return "TEXT";
   }
@@ -172,8 +175,12 @@ async function migrateData() {
     // Add sample roles
     const roleTable = "user_roles";
     try {
+      console.log(`Checking ${roleTable} table...`);
       const roleCheck = await pool.query(`SELECT COUNT(*) FROM ${roleTable}`);
-      if (parseInt(roleCheck.rows[0].count) === 0) {
+      const roleCount = parseInt(roleCheck.rows[0].count);
+      console.log(`Found ${roleCount} roles in ${roleTable}`);
+      
+      if (roleCount === 0) {
         const sampleRoles = [
           {
             name: 'manager',
@@ -233,7 +240,7 @@ async function migrateData() {
         }
       }
     } catch (e) {
-      console.log("Role table might not be ready yet, skipping sample roles migration.");
+      console.error("Role table migration error:", e);
     }
 
     // Migrate Users (Initial Admin)
@@ -245,35 +252,21 @@ async function migrateData() {
       
       // Admin
       await pool.query(`
-        INSERT INTO ${usersTable} (id, name, email, password, role, permissions) 
-        VALUES ($1, $2, $3, $4, $5, $6)
-      `, [`USR-ADMIN`, "Admin User", "admin@auroparts.com", hashedPassword, "admin", JSON.stringify([
-        { module: "dashboard", access: "write" },
-        { module: "products", access: "write" },
-        { module: "customers", access: "write" },
-        { module: "users", access: "write" },
-        { module: "media", access: "write" },
-        { module: "settings", access: "write" }
-      ])]);
+        INSERT INTO ${usersTable} (id, name, email, password, role) 
+        VALUES ($1, $2, $3, $4, $5)
+      `, [`USR-ADMIN`, "Admin User", "admin@auroparts.com", hashedPassword, "admin"]);
 
       // Editor
       await pool.query(`
-        INSERT INTO ${usersTable} (id, name, email, password, role, permissions) 
-        VALUES ($1, $2, $3, $4, $5, $6)
-      `, [`USR-EDITOR`, "Editor User", "editor@auroparts.com", hashedPassword, "editor", JSON.stringify([
-        { module: "dashboard", access: "read" },
-        { module: "products", access: "write" },
-        { module: "media", access: "write" }
-      ])]);
+        INSERT INTO ${usersTable} (id, name, email, password, role) 
+        VALUES ($1, $2, $3, $4, $5)
+      `, [`USR-EDITOR`, "Editor User", "editor@auroparts.com", hashedPassword, "editor"]);
 
       // Viewer
       await pool.query(`
-        INSERT INTO ${usersTable} (id, name, email, password, role, permissions) 
-        VALUES ($1, $2, $3, $4, $5, $6)
-      `, [`USR-VIEWER`, "Viewer User", "viewer@auroparts.com", hashedPassword, "user", JSON.stringify([
-        { module: "dashboard", access: "read" },
-        { module: "products", access: "read" }
-      ])]);
+        INSERT INTO ${usersTable} (id, name, email, password, role) 
+        VALUES ($1, $2, $3, $4, $5)
+      `, [`USR-VIEWER`, "Viewer User", "viewer@auroparts.com", hashedPassword, "user"]);
     }
 
     console.log("Data migration completed successfully.");
@@ -298,6 +291,7 @@ async function startServer() {
   const PORT = 3000;
 
   app.use(express.json());
+  app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
   // Test connection and sync database on start
   const isConnected = await testConnection();
@@ -342,10 +336,7 @@ async function startServer() {
             ? (typeof roleData.access_config === 'string' ? JSON.parse(roleData.access_config) : roleData.access_config)
             : null;
 
-          const permissions = user.permissions 
-            ? (typeof user.permissions === 'string' ? JSON.parse(user.permissions) : user.permissions)
-            : (accessConfig?.permissions || []);
-
+          const permissions = (accessConfig?.permissions || []);
           const accessibleMenus = accessConfig?.accessible_menus || null;
 
           res.json({ 
@@ -404,83 +395,17 @@ async function startServer() {
     }
   });
 
-  app.get("/api/media", async (req, res) => {
+  app.get("/api/media", MediaController.getMedia);
+  app.post("/api/media", upload.single("file"), MediaController.uploadMedia);
+  app.delete("/api/media/:id", MediaController.deleteMedia);
+
+  app.get("/api/available-permissions", (req, res) => {
     try {
-      const { page = 1, limit = 12, search = "", dateFilter = "all" } = req.query;
-      
-      let query = `SELECT * FROM media WHERE 1=1`;
-      const params: any[] = [];
-      let paramIndex = 1;
-
-      if (search) {
-        query += ` AND name ILIKE $${paramIndex}`;
-        params.push(`%${search}%`);
-        paramIndex++;
-      }
-
-      if (dateFilter !== "all") {
-        if (dateFilter === "today") {
-          query += ` AND created_at::date = CURRENT_DATE`;
-        } else if (dateFilter === "this-month") {
-          query += ` AND date_trunc('month', created_at) = date_trunc('month', CURRENT_DATE)`;
-        } else if (dateFilter === "this-year") {
-          query += ` AND date_trunc('year', created_at) = date_trunc('year', CURRENT_DATE)`;
-        }
-      }
-
-      // Get total count
-      const countQuery = query.replace("SELECT *", "SELECT COUNT(*)");
-      const countRes = await pool.query(countQuery, params);
-      const total = parseInt(countRes.rows[0].count);
-
-      // Add pagination
-      query += ` ORDER BY created_at DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
-      params.push(limit, (Number(page) - 1) * Number(limit));
-
-      const result = await pool.query(query, params);
-
-      res.json({
-        media: result.rows,
-        total,
-        page: Number(page),
-        limit: Number(limit),
-        totalPages: Math.ceil(total / Number(limit))
-      });
+      const data = JSON.parse(fs.readFileSync(path.join(process.cwd(), "server/data/available-permissions.json"), "utf-8"));
+      res.json(data);
     } catch (err) {
-      console.error("Media fetch error:", err);
-      res.status(500).json({ message: "Database error", details: (err as any).message });
-    }
-  });
-
-  app.post("/api/media", async (req, res) => {
-    try {
-      const newMedia = req.body;
-      const id = `MED-${Date.now()}`;
-      const columns = ["id", "created_at", ...Object.keys(newMedia)];
-      const values = [id, new Date().toISOString(), ...Object.values(newMedia)];
-      
-      const placeholders = values.map((_, i) => `$${i + 1}`).join(", ");
-      const query = `INSERT INTO media (${columns.map(c => `"${c}"`).join(", ")}) VALUES (${placeholders}) RETURNING *`;
-      
-      const result = await pool.query(query, values);
-      res.status(201).json(result.rows[0]);
-    } catch (err) {
-      console.error("Media upload error:", err);
-      res.status(500).json({ message: "Database error", details: (err as any).message });
-    }
-  });
-
-  app.delete("/api/media/:id", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const result = await pool.query("DELETE FROM media WHERE id = $1", [id]);
-      if (result.rowCount && result.rowCount > 0) {
-        res.json({ success: true, message: "Media deleted" });
-      } else {
-        res.status(404).json({ message: "Media not found" });
-      }
-    } catch (err) {
-      res.status(500).json({ message: "Database error" });
+      console.error("Error reading available-permissions.json:", err);
+      res.status(500).json({ message: "Error reading permissions data", details: (err as any).message });
     }
   });
 
@@ -754,30 +679,8 @@ async function startServer() {
     }
   });
 
-  app.get("/api/settings", async (req, res) => {
-    try {
-      const result = await pool.query("SELECT value FROM settings WHERE key = $1", ["app_settings"]);
-      if (result.rows.length > 0) {
-        res.json(result.rows[0].value);
-      } else {
-        // Fallback to file if not in DB
-        const data = JSON.parse(fs.readFileSync(path.join(process.cwd(), "server/data/settings.json"), "utf-8"));
-        res.json(data);
-      }
-    } catch (err) {
-      res.status(500).json({ message: "Database error" });
-    }
-  });
-
-  app.put("/api/settings", async (req, res) => {
-    try {
-      const data = req.body;
-      await pool.query("INSERT INTO settings (key, value) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET value = $2", ["app_settings", JSON.stringify(data)]);
-      res.json(data);
-    } catch (err) {
-      res.status(500).json({ message: "Database error" });
-    }
-  });
+  app.get("/api/settings", SettingsController.getSettings);
+  app.put("/api/settings", SettingsController.updateSettings);
 
   // 404 handler for API routes
   app.use("/api/*", (req, res) => {
