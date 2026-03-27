@@ -23,7 +23,7 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid email or password'
-            ], 401);
+            ], 403);
         }
 
         // Fetch role data if available

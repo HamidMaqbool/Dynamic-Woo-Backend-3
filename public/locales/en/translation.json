@@ -25,7 +25,8 @@
     "id": "ID",
     "submitting": "Submitting...",
     "success": "Success",
-    "error": "Error"
+    "error": "Error",
+    "saveChanges": "Save Changes"
   },
   "dashboard": {
     "welcome": "Welcome back",

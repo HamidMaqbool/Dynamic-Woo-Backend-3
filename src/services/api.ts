@@ -1,4 +1,5 @@
 
+import { error } from 'console';
 import { useCRMStore } from '../store/useStore';
 
 interface FetchOptions extends RequestInit {
@@ -15,6 +16,7 @@ declare global {
 
 export async function apiFetch(url: string, options: FetchOptions = {}) {
     const { token, logout, setNotification } = useCRMStore.getState();
+   
     const baseUrl = (window.APP_CONFIG?.API_BASE_URL || '').replace(/\/$/, '');
     const cleanUrl = url.startsWith('/') ? url : `/${url}`;
     let fullUrl = `${baseUrl}${cleanUrl}`;
@@ -25,6 +27,7 @@ export async function apiFetch(url: string, options: FetchOptions = {}) {
     }
     if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
         headers.set('Content-Type', 'application/json');
+
     }
     if (options.params) {
         const searchParams = new URLSearchParams(options.params);
@@ -48,10 +51,18 @@ export async function apiFetch(url: string, options: FetchOptions = {}) {
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
+            
+            setNotification({ message: errorData.message || 'Request failed', type: 'error' });
+
             throw new Error(errorData.message || 'Request failed');
         }
 
-        return await response.json();
+        const data = await response.json();
+      
+        if(data.message){
+            setNotification({ message: data.message || 'Request successful', type: data.success ? 'success' : 'error' });
+        }
+        return data;
     } catch (error) {
         console.error('API Fetch Error:', error);
         throw error;

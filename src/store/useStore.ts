@@ -250,9 +250,10 @@ export const useCRMStore = create<CRMState>((set, get) => ({
                 items: [data, ...state.items],
                 isLoading: false,
             }));
-            get().addNotification('Item added successfully', 'success');
-            get().fetchData(entity);
+
+            // get().fetchData(entity);
         } catch (error) {
+            
             set({ isLoading: false });
         }
     },
@@ -368,7 +369,7 @@ export const useCRMStore = create<CRMState>((set, get) => ({
         } catch (error) {
             console.error("Login error", error);
             set({ isLoading: false });
-            get().addNotification(error instanceof Error ? error.message : 'An error occurred during login', 'error');
+            // get().addNotification(error instanceof Error ? error.message : 'An error occurred during login', 'error');
             return false;
         }
     },

@@ -83,18 +83,27 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ entity }) => {
                 }
             } else {
                 const defaults: any = {};
-                
+
                 console.log("DynamicForm: Setting up defaults from formConfig:", formConfig);
                 formConfig.forEach((fields: any) => {
 
                     fields.fields.forEach((field: any) => {
-                    
-                
-                    if (field.value !== undefined) defaults[field.name] = field.value;
-                    if (field.type === 'repeater' && !defaults[field.name]) {
-                        defaults[field.name] = [];
-                    }
-                })
+
+
+                        if (field.value !== undefined) {
+                            defaults[field.name] = field.value;
+                        } else if (field.default !== undefined) {
+                            defaults[field.name] = field.default;
+                        }
+
+                        if (field.type === 'repeater' && !defaults[field.name]) {
+                            if (field.default !== undefined) {
+                                defaults[field.name] = field.default;
+                            } else {
+                                defaults[field.name] = [];
+                            }
+                        }
+                    })
 
                 });
                 setSections(sections);
@@ -106,7 +115,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ entity }) => {
         loadData();
     }, [id, schema, fetchItemById, navigate, entity, basePath]);
 
-    
+
 
     const renderFieldInternal = useCallback((field: any, value: any, onChange: (val: any) => void) => {
         const hasError = !!errors[field.name];
@@ -287,16 +296,17 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ entity }) => {
         setIsSubmitting(true);
         try {
             if (id) {
+             
                 await updateItem(entity, id, formData);
             } else {
                 // For new items, we might need some defaults if not provided
                 const newItem = { ...formData };
 
                 // Add entity-specific defaults if needed
-           
+
                 await addItem(entity, newItem);
             }
-            navigate(basePath);
+            // navigate(basePath);
         } catch (error) {
             // Error is handled in store
         } finally {
@@ -408,7 +418,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ entity }) => {
                                                         </div>
                                                     )}
                                                 </div>
- 
+
                                                 {renderFieldInternal(field, formData[field.name], (val) => handleChange(field.name, val))}
                                                 {errors[field.name] && (
                                                     <p className="mt-1.5 text-[10px] font-bold text-rose-500 flex items-center gap-1">
