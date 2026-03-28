@@ -44,6 +44,8 @@ interface CRMState {
     totalPages: number;
     searchQuery: string;
     filters: Record<string, any>;
+    sortBy: string | null;
+    sortOrder: 'asc' | 'desc';
     theme: 'light' | 'dark' | 'red' | 'green';
     language: string;
     direction: 'ltr' | 'rtl';
@@ -80,6 +82,8 @@ interface CRMState {
     setItemsPerPage: (count: number) => void;
     setSearchQuery: (query: string) => void;
     setFilters: (filters: Partial<CRMState['filters']>) => void;
+    resetFilters: (initialFilters?: Record<string, any>) => void;
+    setSort: (sortBy: string | null, sortOrder?: 'asc' | 'desc') => void;
     setTheme: (theme: CRMState['theme']) => void;
     addNotification: (message: string, type: 'success' | 'error') => void;
     removeNotification: (id: string) => void;
@@ -107,6 +111,8 @@ export const useCRMStore = create<CRMState>((set, get) => ({
         status: 'all',
         parentId: 'all',
     },
+    sortBy: null,
+    sortOrder: 'asc',
     theme: (localStorage.getItem('crm-theme') as any) || 'light',
     language: localStorage.getItem('crm-lang') || 'en',
     direction: (localStorage.getItem('crm-dir') as any) || 'ltr',
@@ -118,13 +124,15 @@ export const useCRMStore = create<CRMState>((set, get) => ({
 
     fetchData: async (entity) => {
         set({ isLoading: true });
-        const { currentPage, itemsPerPage, searchQuery, filters } = get();
+        const { currentPage, itemsPerPage, searchQuery, filters, sortBy, sortOrder } = get();
         try {
             const data = await apiFetch(`/api/${entity}`, {
                 params: {
                     page: currentPage.toString(),
                     limit: itemsPerPage.toString(),
                     search: searchQuery,
+                    sortBy: sortBy || '',
+                    sortOrder: sortOrder,
                     ...filters
                 }
             });
@@ -319,6 +327,19 @@ export const useCRMStore = create<CRMState>((set, get) => ({
         set((state) => ({ 
             filters: { ...state.filters, ...filters },
             currentPage: 1 
+        }));
+    },
+    resetFilters: (initialFilters) => {
+        set({ 
+            filters: initialFilters || { status: 'all', parentId: 'all' },
+            currentPage: 1 
+        });
+    },
+    setSort: (sortBy, sortOrder) => {
+        set((state) => ({
+            sortBy,
+            sortOrder: sortOrder || (state.sortBy === sortBy && state.sortOrder === 'asc' ? 'desc' : 'asc'),
+            currentPage: 1
         }));
     },
     setTheme: (theme) => {
