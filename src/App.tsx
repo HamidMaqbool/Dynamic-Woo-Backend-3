@@ -16,17 +16,14 @@ import './i18n';
 import { useTranslation } from 'react-i18next';
 
 export default function App() {
-  const { isAuthenticated, theme, language, direction, fetchSchema, fetchSidebar, fetchRoutes, fetchSettings } = useCRMStore();
+  const { isAuthenticated, theme, language, direction, fetchAppConfig } = useCRMStore();
   const { i18n } = useTranslation();
 
   useEffect(() => {
     if (isAuthenticated) {
-      fetchSchema();
-      fetchSidebar();
-      fetchRoutes();
-      fetchSettings();
+      fetchAppConfig();
     }
-  }, [isAuthenticated, fetchSchema, fetchSidebar, fetchRoutes, fetchSettings]);
+  }, [isAuthenticated, fetchAppConfig]);
 
   useEffect(() => {
     if (language) {

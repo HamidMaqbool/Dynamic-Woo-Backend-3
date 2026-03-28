@@ -137,14 +137,14 @@ export const Sidebar: React.FC = () => {
     const [logos, setLogos] = useState({ big: '', collapsed: '' });
     const location = useLocation();
 
-    useEffect(() => {
-        if (sidebarData.length === 0) {
-            fetchSidebar();
-        }
-        if (!settingsData) {
-            fetchSettings();
-        }
-    }, [fetchSidebar, fetchSettings, settingsData, sidebarData.length]);
+    // useEffect(() => {
+    //     if (sidebarData.length === 0) {
+    //         fetchSidebar();
+    //     }
+    //     if (!settingsData) {
+    //         fetchSettings();
+    //     }
+    // }, [fetchSidebar, fetchSettings, settingsData, sidebarData.length]);
 
     useEffect(() => {
         if (settingsData && settingsData.tabs) {

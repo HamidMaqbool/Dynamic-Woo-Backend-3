@@ -24,6 +24,7 @@ export const Settings: React.FC = () => {
     const [activeMediaField, setActiveMediaField] = useState<string | null>(null);
 
     useEffect(() => {
+        console.log("Settings data changed:", settingsData);
         if (!settingsData) {
             fetchSettings();
         } else if (settingsData.tabs && settingsData.tabs.length > 0) {

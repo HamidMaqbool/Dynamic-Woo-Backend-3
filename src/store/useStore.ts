@@ -1,4 +1,5 @@
 
+
 import { create } from 'zustand';
 import { apiFetch } from '../services/api';
 
@@ -49,18 +50,18 @@ interface CRMState {
     direction: 'ltr' | 'rtl';
     editingItem: any | null;
     notifications: { id: string; message: string; type: 'success' | 'error' }[];
-    
+
     // Auth
     isAuthenticated: boolean;
     token: string | null;
-    user: { 
-        email: string; 
-        name: string; 
-        role: string; 
+    user: {
+        email: string;
+        name: string;
+        role: string;
         permissions?: { module: string; access: string }[];
         accessibleMenus?: { path: string }[];
     } | null;
-    
+
     // Actions
     fetchData: (entity: string) => Promise<void>;
     fetchSidebar: () => Promise<void>;
@@ -128,11 +129,11 @@ export const useCRMStore = create<CRMState>((set, get) => ({
                     ...filters
                 }
             });
-            set({ 
-                items: data[entity] || data.items || [], 
+            set({
+                items: data[entity] || data.items || [],
                 totalItems: data.total || 0,
                 totalPages: data.totalPages || 0,
-                isLoading: false 
+                isLoading: false
             });
         } catch (error) {
             set({ isLoading: false });
@@ -153,14 +154,14 @@ export const useCRMStore = create<CRMState>((set, get) => ({
         try {
             const data = await apiFetch('/api/dashboard');
             set({ dashboardData: data });
-        } catch (error) {}
+        } catch (error) { }
     },
 
     fetchSettings: async () => {
         try {
             const data = await apiFetch('/api/settings');
             set({ settingsData: data });
-            
+
             // Sync language and direction from settings
             const localizationTab = data.tabs?.find((t: any) => t.id === 'localization');
             if (localizationTab) {
@@ -175,9 +176,34 @@ export const useCRMStore = create<CRMState>((set, get) => ({
                     set({ direction: dirField.value });
                 }
             }
-        } catch (error) {}
+        } catch (error) { }
     },
 
+    fetchAppConfig: async () => {
+        try {
+            const data = await apiFetch('/api/app-config');
+            set({
+                sidebarData: data.sidebar || [],
+                schema: data.schema || null,
+                routes: data.routes || null,
+                settingsData: data.settings || null,
+            });
+            // Sync language and direction from settings
+            const localizationTab = data.settings?.tabs?.find((t: any) => t.id === 'localization');
+            if (localizationTab) {
+                const langField = localizationTab.sections[0].fields.find((f: any) => f.name === 'language');
+                const dirField = localizationTab.sections[0].fields.find((f: any) => f.name === 'direction');
+                if (langField) {
+                    localStorage.setItem('crm-lang', langField.value);
+                    set({ language: langField.value });
+                }
+                if (dirField) {
+                    localStorage.setItem('crm-dir', dirField.value);
+                    set({ direction: dirField.value });
+                }
+            }
+        } catch (error) { }
+    },
     updateSettings: async (settings: any) => {
         set({ isLoading: true });
         try {
@@ -185,8 +211,8 @@ export const useCRMStore = create<CRMState>((set, get) => ({
                 method: 'PUT',
                 body: JSON.stringify(settings)
             });
-            set({ 
-                settingsData: data, 
+            set({
+                settingsData: data,
                 isLoading: false,
             });
 
@@ -215,14 +241,14 @@ export const useCRMStore = create<CRMState>((set, get) => ({
         try {
             const data = await apiFetch('/api/schema');
             set({ schema: data });
-        } catch (error) {}
+        } catch (error) { }
     },
 
     fetchRoutes: async () => {
         try {
             const data = await apiFetch('/api/routes');
             set({ routes: data });
-        } catch (error) {}
+        } catch (error) { }
     },
 
     fetchItemById: async (entity, id) => {
@@ -246,14 +272,14 @@ export const useCRMStore = create<CRMState>((set, get) => ({
                 method: 'POST',
                 body: JSON.stringify(item)
             });
-            set((state) => ({ 
+            set((state) => ({
                 items: [data, ...state.items],
                 isLoading: false,
             }));
 
             // get().fetchData(entity);
         } catch (error) {
-            
+
             set({ isLoading: false });
         }
     },
@@ -268,8 +294,7 @@ export const useCRMStore = create<CRMState>((set, get) => ({
                 items: state.items.map(p => p.id === id ? data : p),
                 isLoading: false,
             }));
-            get().addNotification('Item updated successfully', 'success');
-            get().fetchData(entity);
+
         } catch (error) {
             set({ isLoading: false });
         }
@@ -291,7 +316,7 @@ export const useCRMStore = create<CRMState>((set, get) => ({
     bulkDeleteItems: async (entity, ids) => {
         set({ isLoading: true });
         try {
-            await apiFetch(`/api/${entity}/bulk-delete`, { 
+            await apiFetch(`/api/${entity}/bulk-delete`, {
                 method: 'POST',
                 body: JSON.stringify({ ids })
             });
@@ -317,9 +342,9 @@ export const useCRMStore = create<CRMState>((set, get) => ({
         set({ searchQuery: query, currentPage: 1 });
     },
     setFilters: (filters) => {
-        set((state) => ({ 
+        set((state) => ({
             filters: { ...state.filters, ...filters },
-            currentPage: 1 
+            currentPage: 1
         }));
     },
     setTheme: (theme) => {
@@ -342,7 +367,7 @@ export const useCRMStore = create<CRMState>((set, get) => ({
             get().addNotification(notification.message, notification.type);
         }
     },
-    
+
     login: async (email, password) => {
         set({ isLoading: true });
         try {
@@ -350,15 +375,15 @@ export const useCRMStore = create<CRMState>((set, get) => ({
                 method: 'POST',
                 body: JSON.stringify({ email, password })
             });
-            
+
             if (data.success) {
                 localStorage.setItem('crm-token', data.token);
                 localStorage.setItem('crm-user', JSON.stringify(data.user));
-                set({ 
-                    isAuthenticated: true, 
+                set({
+                    isAuthenticated: true,
                     user: data.user,
                     token: data.token,
-                    isLoading: false 
+                    isLoading: false
                 });
                 return true;
             } else {
