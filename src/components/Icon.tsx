@@ -1,5 +1,6 @@
 
 import React from 'react';
+import * as LucideIcons from 'lucide-react';
 
 interface IconProps {
   name: string;
@@ -8,19 +9,19 @@ interface IconProps {
 }
 
 export const Icon: React.FC<IconProps> = ({ name, className, size = 20 }) => {
+  // Convert kebab-case to PascalCase for Lucide icons
+  const pascalName = name
+    .split('-')
+    .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+    .join('');
+
+  const LucideIcon = (LucideIcons as any)[pascalName] || (LucideIcons as any)[name] || LucideIcons.HelpCircle;
+
   return (
-    <svg 
+    <LucideIcon 
       className={className} 
-      width={size} 
-      height={size} 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round"
-    >
-      <use xlinkHref={`/icons.svg#icon-${name}`} />
-    </svg>
+      size={size} 
+    />
   );
 };
 

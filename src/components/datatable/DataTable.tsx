@@ -1,6 +1,6 @@
 
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useCRMStore, Product } from '../../store/useStore';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../../utils/cn';
@@ -22,6 +22,7 @@ interface DataTableProps {
 export const DataTable: React.FC<DataTableProps> = ({ entity = 'products' }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
     const { hasPermission } = usePermissions();
     const canWrite = hasPermission(entity, 'write');
     const {
@@ -36,10 +37,15 @@ export const DataTable: React.FC<DataTableProps> = ({ entity = 'products' }) => 
         totalPages,
         searchQuery,
         filters,
-        setCurrentPage,
-        setItemsPerPage,
+        sortBy,
+        sortOrder,
+        setCurrentPage, 
+        setItemsPerPage, 
         setSearchQuery,
         setFilters,
+        resetFilters,
+        setSort,
+        addItem,
         updateItem,
         deleteItem,
         bulkDeleteItems,
@@ -48,7 +54,7 @@ export const DataTable: React.FC<DataTableProps> = ({ entity = 'products' }) => 
     } = useCRMStore();
 
     const [localChanges, setLocalChanges] = useState<Record<string, any>>({});
-    const [table, setTable] = useState<Record<string, any>>({});
+    const [table, setTable] = useState<Record<string, any>>(null);
     const [initialCols, setInitialCols] = useState<Record<string, any>>([]);
     const [visibleColumns, setVisibleColumns] = useState<string[]>([]);
 
@@ -64,6 +70,7 @@ export const DataTable: React.FC<DataTableProps> = ({ entity = 'products' }) => 
 
 
 
+
     useEffect(() => {
         if (schema) {
             const foundTable = schema.find((s: any) => s.entity === entity);
@@ -76,9 +83,56 @@ export const DataTable: React.FC<DataTableProps> = ({ entity = 'products' }) => 
 
 
 
+    // const tableKey = Object.keys(schema?.table || {}).find(key => key.includes(entity)) || "auroparts-product";
+    // const tableConfig = schema?.table[tableKey]?.table;
+    // const filtersConfig = schema?.table[tableKey]?.filters;
+    // const initialCols = tableConfig?.cols || [];
+    // const [visibleColumns, setVisibleColumns] = useState<string[]>(initialCols.map((c: any) => c.name));
+
+    // Sync URL params to store on mount and when URL changes
+    useEffect(() => {
+        const params = Object.fromEntries(searchParams.entries());
+        const { search, page, limit, sortBy: urlSortBy, sortOrder: urlSortOrder, ...restFilters } = params;
+
+        if (search !== undefined && search !== searchQuery) setSearchQuery(search);
+        if (page !== undefined && parseInt(page) !== currentPage) setCurrentPage(parseInt(page));
+        if (limit !== undefined && parseInt(limit) !== itemsPerPage) setItemsPerPage(parseInt(limit));
+        if (urlSortBy !== undefined && urlSortBy !== sortBy) setSort(urlSortBy, urlSortOrder as any);
+        
+        // Only update filters if they are different
+        const currentFiltersStr = JSON.stringify(filters);
+        const newFiltersStr = JSON.stringify({ ...filters, ...restFilters });
+        if (currentFiltersStr !== newFiltersStr) {
+            setFilters(restFilters);
+        }
+    }, [searchParams]);
+
+    // Sync store to URL params when store changes
+    useEffect(() => {
+        const newParams = new URLSearchParams();
+        if (searchQuery) newParams.set('search', searchQuery);
+        if (currentPage > 1) newParams.set('page', currentPage.toString());
+        if (itemsPerPage !== 10) newParams.set('limit', itemsPerPage.toString());
+        if (sortBy) {
+            newParams.set('sortBy', sortBy);
+            newParams.set('sortOrder', sortOrder);
+        }
+        
+        Object.entries(filters).forEach(([key, value]) => {
+            if (value && value !== 'all') {
+                newParams.set(key, value);
+            }
+        });
+
+        // Only update URL if it's different to avoid infinite loops
+        if (newParams.toString() !== searchParams.toString()) {
+            setSearchParams(newParams, { replace: true });
+        }
+    }, [searchQuery, currentPage, itemsPerPage, filters, sortBy, sortOrder]);
+
     useEffect(() => {
         fetchData(entity);
-    }, [fetchData, entity, currentPage, itemsPerPage, searchQuery, filters]);
+    }, [fetchData, entity, currentPage, itemsPerPage, searchQuery, filters, sortBy, sortOrder]);
 
     if (!schema || !table) {
         return <TableSkeleton />;
@@ -190,6 +244,7 @@ export const DataTable: React.FC<DataTableProps> = ({ entity = 'products' }) => 
     const allRows = [...items];
 
     
+    console.log(table);
     
     return (
         <div className="flex flex-col h-full bg-[#F8F9FA] text-[#1A1A1A] font-sans">
@@ -205,16 +260,29 @@ export const DataTable: React.FC<DataTableProps> = ({ entity = 'products' }) => 
                 <TableFilters
                     searchQuery={searchQuery}
                     onSearchChange={setSearchQuery}
-                    status={filters.status}
-                    onStatusChange={(status) => setFilters({ status })}
-                    statusOptions={statusOptions}
-                    parentId={filters.parentId}
-                    onParentIdChange={(parentId) => setFilters({ parentId })}
+                    filters={filters}
+                    onFilterChange={setFilters}
+                    filtersConfig={table.filters}
                     onReset={() => {
                         setSearchQuery('');
-                        setFilters({ status: 'all', parentId: 'all' });
+                        const initialFilters: Record<string, any> = {};
+                        if (table?.filters?.more_filters) {
+                            table.filters.more_filters.forEach((f: any) => {
+                                const key = f.label.toLowerCase().replace(/\s+/g, '_');
+                                if (f.type === 'date-range') {
+                                    initialFilters[`${key}_start`] = '';
+                                    initialFilters[`${key}_end`] = '';
+                                } else {
+                                    initialFilters[key] = f.type === 'select' ? 'all' : '';
+                                }
+                            });
+                        } else {
+                            initialFilters.status = 'all';
+                            initialFilters.parentId = 'all';
+                        }
+                        resetFilters(initialFilters);
                     }}
-                    showReset={filters.status !== 'all' || filters.parentId !== 'all' || !!searchQuery}
+                    showReset={Object.values(filters).some(v => v !== 'all' && v !== '') || !!searchQuery}
                     columns={initialCols.map((c: any) => ({ name: c.name, visible: visibleColumns.includes(c.name) }))}
                     onToggleColumn={toggleColumn}
                 />
@@ -334,12 +402,31 @@ export const DataTable: React.FC<DataTableProps> = ({ entity = 'products' }) => 
                                             <th
                                                 key={col.name}
                                                 className={cn(
-                                                    "px-6 py-4 text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider",
+                                                    "px-6 py-4 text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider cursor-pointer hover:bg-slate-100/50 transition-colors group",
                                                     col.responsive === 'expandable' || col.responsive === 'hide' ? "hidden md:table-cell" : "table-cell"
                                                 )}
                                                 style={{ width: col.width }}
+                                                onClick={() => setSort(col.name)}
                                             >
-                                                {col.name}
+                                                <div className="flex items-center gap-2">
+                                                    {col.name}
+                                                    <div className="flex flex-col opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <Icon 
+                                                            name="chevron-up" 
+                                                            className={cn(
+                                                                "w-2.5 h-2.5 -mb-1",
+                                                                sortBy === col.name && sortOrder === 'asc' ? "text-accent opacity-100" : "text-slate-300"
+                                                            )} 
+                                                        />
+                                                        <Icon 
+                                                            name="chevron-down" 
+                                                            className={cn(
+                                                                "w-2.5 h-2.5",
+                                                                sortBy === col.name && sortOrder === 'desc' ? "text-accent opacity-100" : "text-slate-300"
+                                                            )} 
+                                                        />
+                                                    </div>
+                                                </div>
                                             </th>
                                         ))}
                                     </tr>

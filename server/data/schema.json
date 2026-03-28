@@ -28,7 +28,41 @@
                     { "name": "Status", "sortable": true, "col": "status", "width": "150px", "columnType": "select", "responsive": "expandable" },
                     { "name": "Created Date", "sortable": true, "col": "created_at", "width": "150px", "responsive": "hide" },
                     { "name": "Action", "sortable": true, "col": ["edit", "delete"], "type": "action", "width": "150px", "responsive": "expandable" }
-                ]
+                ],
+                "filters": {
+                    "search_input": true,
+                    "columns": true,
+                    "more_filters": [
+                        {
+                            "label": "Search",
+                            "type": "main",
+                            "class": "full-width"
+                        },
+                        {
+                            "label": "Date Range",
+                            "type": "date-range",
+                            "class": "1/2-width"
+                        },
+                        {
+                            "label": "Status",
+                            "type": "select",
+                            "class": "1/4-width",
+                            "options": [
+                                { "label": "Published", "value": "published" },
+                                { "label": "Draft", "value": "draft" }
+                            ]
+                        },
+                        {
+                            "label": "Product Type",
+                            "type": "select",
+                            "class": "1/4-width",
+                            "options": [
+                                { "label": "Simple", "value": "simple" },
+                                { "label": "Variable", "value": "variable" }
+                            ]
+                        }
+                    ]
+                }
             }
         },
         "media": {
