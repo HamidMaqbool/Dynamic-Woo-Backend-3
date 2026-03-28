@@ -250,6 +250,8 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ entity }) => {
 
         formConfig.forEach((section: any) => {
             section.fields.forEach((field: any) => {
+                if (!shouldShowField(field, formData)) return;
+
                 const fieldRules: ValidationRule[] = [];
                 if (field.valid === 'required') {
                     fieldRules.push(rules.required);
@@ -273,6 +275,34 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ entity }) => {
         const newErrors = runValidation(formData, validationSchema);
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
+    };
+
+    const shouldShowField = (field: any, data: any) => {
+        if (!field.show) return true;
+        
+        const { field: targetField, condition, value: targetValue } = field.show;
+        const currentValue = data[targetField];
+        
+        switch (condition) {
+            case 'eq':
+                return currentValue === targetValue;
+            case 'neq':
+                return currentValue !== targetValue;
+            case 'gt':
+                return Number(currentValue) > Number(targetValue);
+            case 'lt':
+                return Number(currentValue) < Number(targetValue);
+            case 'gte':
+                return Number(currentValue) >= Number(targetValue);
+            case 'lte':
+                return Number(currentValue) <= Number(targetValue);
+            case 'contains':
+                return Array.isArray(currentValue) 
+                    ? currentValue.includes(targetValue) 
+                    : String(currentValue).includes(String(targetValue));
+            default:
+                return true;
+        }
     };
 
     const handleChange = (name: string, value: any) => {
@@ -398,35 +428,37 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ entity }) => {
                                         {section.label}
                                     </h2>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
-
-                                        {section.fields.map((field, fIdx) => (
-                                            <div
-                                                key={fIdx}
-                                                className={field.class === 'full' ? 'sm:col-span-2' : 'sm:col-span-1'}
-                                            >
-                                                <div className="flex items-center justify-between mb-1.5">
-                                                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide">
-                                                        {field.label}
-                                                        {field.valid === 'required' && <span className="text-rose-500 ml-1">*</span>}
-                                                    </label>
-                                                    {field.tooltip && (
-                                                        <div className="group relative">
-                                                            <Icon name="info" className="w-3.5 h-3.5 text-slate-400 cursor-help" />
-                                                            <div className="absolute bottom-full right-0 mb-2 hidden group-hover:block w-48 p-2 bg-slate-900 text-white text-[10px] rounded shadow-xl z-30">
-                                                                {field.tooltip}
+                                        {section.fields.map((field, fIdx) => {
+                                            if (!shouldShowField(field, formData)) return null;
+                                            
+                                            return (
+                                                <div 
+                                                    key={fIdx} 
+                                                    className={field.class === 'full' ? 'sm:col-span-2' : 'sm:col-span-1'}
+                                                >
+                                                    <div className="flex items-center justify-between mb-1.5">
+                                                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide">
+                                                            {field.label}
+                                                            {field.valid === 'required' && <span className="text-rose-500 ml-1">*</span>}
+                                                        </label>
+                                                        {field.tooltip && (
+                                                            <div className="group relative">
+                                                                <Icon name="info" className="w-3.5 h-3.5 text-slate-400 cursor-help" />
+                                                                <div className="absolute bottom-full right-0 mb-2 hidden group-hover:block w-48 p-2 bg-slate-900 text-white text-[10px] rounded shadow-xl z-30">
+                                                                    {field.tooltip}
+                                                                </div>
                                                             </div>
-                                                        </div>
+                                                        )}
+                                                    </div>
+                                                    {renderFieldInternal(field, formData[field.name], (val) => handleChange(field.name, val))}
+                                                    {errors[field.name] && (
+                                                        <p className="mt-1.5 text-[10px] font-bold text-rose-500 flex items-center gap-1">
+                                                            <Icon name="alert-circle" className="w-3 h-3" /> {errors[field.name]}
+                                                        </p>
                                                     )}
                                                 </div>
-
-                                                {renderFieldInternal(field, formData[field.name], (val) => handleChange(field.name, val))}
-                                                {errors[field.name] && (
-                                                    <p className="mt-1.5 text-[10px] font-bold text-rose-500 flex items-center gap-1">
-                                                        <Icon name="alert-circle" className="w-3 h-3" /> {errors[field.name]}
-                                                    </p>
-                                                )}
-                                            </div>
-                                        ))}
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             ))}
@@ -440,21 +472,25 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ entity }) => {
                                         {section.label}
                                     </h2>
                                     <div className="space-y-5">
-                                        {section.fields.map((field, fIdx) => (
-                                            <div key={fIdx}>
-                                                {field.label && (
-                                                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
-                                                        {field.label}
-                                                    </label>
-                                                )}
-                                                {renderFieldInternal(field, formData[field.name], (val) => handleChange(field.name, val))}
-                                                {errors[field.name] && (
-                                                    <p className="mt-1 text-[10px] font-bold text-rose-500 flex items-center gap-1">
-                                                        <Icon name="alert-circle" className="w-3 h-3" /> {errors[field.name]}
-                                                    </p>
-                                                )}
-                                            </div>
-                                        ))}
+                                        {section.fields.map((field, fIdx) => {
+                                            if (!shouldShowField(field, formData)) return null;
+
+                                            return (
+                                                <div key={fIdx}>
+                                                    {field.title && (
+                                                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
+                                                            {field.title}
+                                                        </label>
+                                                    )}
+                                                    {renderFieldInternal(field, formData[field.name], (val) => handleChange(field.name, val))}
+                                                    {errors[field.name] && (
+                                                        <p className="mt-1 text-[10px] font-bold text-rose-500 flex items-center gap-1">
+                                                            <Icon name="alert-circle" className="w-3 h-3" /> {errors[field.name]}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             ))}
