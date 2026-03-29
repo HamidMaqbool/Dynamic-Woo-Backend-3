@@ -31,34 +31,35 @@
                 ],
                 "filters": {
                     "search_input": true,
-                    "columns": true,
-                    "more_filters": [
+                    "columns": false,
+                    "more_enabled": true,
+                    "more": [
                         {
-                            "label": "Search",
-                            "type": "main",
-                            "class": "full-width"
+                            "label": "name",
+                            "name": "name",
+                            "type": "text",
+                            "condition": "like"
                         },
                         {
                             "label": "Date Range",
                             "type": "date-range",
-                            "class": "1/2-width"
+                            "name": "created_at",
+                            "condition": "between"
                         },
                         {
                             "label": "Status",
                             "type": "select",
-                            "class": "1/4-width",
+                            "name": "status",
+                            "condition": "equal",
                             "options": [
-                                { "label": "Published", "value": "published" },
-                                { "label": "Draft", "value": "draft" }
-                            ]
-                        },
-                        {
-                            "label": "Product Type",
-                            "type": "select",
-                            "class": "1/4-width",
-                            "options": [
-                                { "label": "Simple", "value": "simple" },
-                                { "label": "Variable", "value": "variable" }
+                                {
+                                    "label": "Published",
+                                    "value": "published"
+                                },
+                                {
+                                    "label": "Draft",
+                                    "value": "draft"
+                                }
                             ]
                         }
                     ]
@@ -196,6 +197,7 @@
             {
                 "title": "Specifications",
                 "name": "specs",
+                "show": { "field": "show_specs", "condition": "eq", "value": true },
                 "fields": [
                     {
                         "title": "Technical Specs",
@@ -207,6 +209,14 @@
                             { "title": "Value", "name": "value", "type": "text", "class": "half" }
                         ]
                     }
+                ]
+            },
+            {
+                "title": "Settings",
+                "type": "sidebar",
+                "name": "settings",
+                "fields": [
+                    { "title": "Show Specifications", "name": "show_specs", "value": false, "type": "checkbox" }
                 ]
             },
             {

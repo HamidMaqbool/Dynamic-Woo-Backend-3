@@ -27,6 +27,50 @@ interface TableFiltersProps {
     onToggleColumn: (name: string) => void;
 }
 
+const DelayedInput: React.FC<{
+    value: string;
+    onChange: (val: string) => void;
+    placeholder?: string;
+    className?: string;
+    type?: string;
+    icon?: string;
+}> = ({ value, onChange, placeholder, className, type = "text", icon }) => {
+    const [localValue, setLocalValue] = React.useState(value);
+
+    React.useEffect(() => {
+        setLocalValue(value);
+    }, [value]);
+
+    const handleBlur = () => {
+        if (localValue !== value) {
+            onChange(localValue);
+        }
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            onChange(localValue);
+            // Optional: blur the input on enter
+            (e.target as HTMLInputElement).blur();
+        }
+    };
+
+    return (
+        <div className="relative w-full">
+            {icon && <Icon name={icon} className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />}
+            <input
+                type={type}
+                value={localValue}
+                onChange={(e) => setLocalValue(e.target.value)}
+                onBlur={handleBlur}
+                onKeyDown={handleKeyDown}
+                placeholder={placeholder}
+                className={cn("w-full transition-all", className)}
+            />
+        </div>
+    );
+};
+
 export const TableFilters: React.FC<TableFiltersProps> = ({
     searchQuery,
     onSearchChange,
@@ -72,16 +116,13 @@ export const TableFilters: React.FC<TableFiltersProps> = ({
                 return (
                     <div key={filter.label} className={cn("flex flex-col gap-1.5", getWidthClass(filter.class))}>
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{filter.label}</span>
-                        <div className="relative">
-                            <Icon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
-                            <input 
-                                type="text" 
-                                placeholder={filter.label}
-                                className="w-full pl-9 pr-4 py-1.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent text-xs transition-all"
-                                value={filters[filterKey] || ''}
-                                onChange={(e) => onFilterChange({ [filterKey]: e.target.value })}
-                            />
-                        </div>
+                        <DelayedInput 
+                            value={filters[filterKey] || ''}
+                            onChange={(val) => onFilterChange({ [filterKey]: val })}
+                            placeholder={filter.label}
+                            icon="search"
+                            className="pl-9 pr-4 py-1.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent text-xs"
+                        />
                     </div>
                 );
             case 'select':
@@ -132,13 +173,12 @@ export const TableFilters: React.FC<TableFiltersProps> = ({
             <div className="flex items-center justify-end gap-3">
                 {(!filtersConfig || filtersConfig.search_input) && (
                     <div className="relative w-full max-w-[280px]">
-                        <Icon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                        <input 
-                            type="text" 
-                            placeholder={t('datatable.search')}
-                            className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent text-sm transition-all"
+                        <DelayedInput 
                             value={searchQuery}
-                            onChange={(e) => onSearchChange(e.target.value)}
+                            onChange={onSearchChange}
+                            placeholder={t('datatable.search')}
+                            icon="search"
+                            className="pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent text-sm"
                         />
                     </div>
                 )}

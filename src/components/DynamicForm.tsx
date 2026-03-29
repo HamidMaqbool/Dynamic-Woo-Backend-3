@@ -93,8 +93,10 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ entity }) => {
         const validationSchema: Record<string, ValidationRule[]> = {};
         
         formConfig.forEach((section: any) => {
+            if (!shouldShowItem(section, formData)) return;
+
             section.fields.forEach((field: any) => {
-                if (!shouldShowField(field, formData)) return;
+                if (!shouldShowItem(field, formData)) return;
 
                 const fieldRules: ValidationRule[] = [];
                 if (field.valid === 'required') {
@@ -121,10 +123,10 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ entity }) => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const shouldShowField = (field: any, data: any) => {
-        if (!field.show) return true;
+    const shouldShowItem = (item: any, data: any) => {
+        if (!item.show) return true;
         
-        const { field: targetField, condition, value: targetValue } = field.show;
+        const { field: targetField, condition, value: targetValue } = item.show;
         const currentValue = data[targetField];
         
         switch (condition) {
@@ -397,79 +399,87 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ entity }) => {
                         
                         {/* Main Content */}
                         <div className="lg:col-span-8 space-y-6 sm:space-y-8">
-                            {mainSections.map((section, sIdx) => (
-                                <div key={sIdx} className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
-                                    <h2 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
-                                        <span className="w-1.5 h-6 bg-accent rounded-full"></span>
-                                        {section.title}
-                                    </h2>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
-                                        {section.fields.map((field, fIdx) => {
-                                            if (!shouldShowField(field, formData)) return null;
-                                            
-                                            return (
-                                                <div 
-                                                    key={fIdx} 
-                                                    className={field.class === 'full' ? 'sm:col-span-2' : 'sm:col-span-1'}
-                                                >
-                                                    <div className="flex items-center justify-between mb-1.5">
-                                                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide">
-                                                            {field.title}
-                                                            {field.valid === 'required' && <span className="text-rose-500 ml-1">*</span>}
-                                                        </label>
-                                                        {field.tooltip && (
-                                                            <div className="group relative">
-                                                                <Icon name="info" className="w-3.5 h-3.5 text-slate-400 cursor-help" />
-                                                                <div className="absolute bottom-full right-0 mb-2 hidden group-hover:block w-48 p-2 bg-slate-900 text-white text-[10px] rounded shadow-xl z-30">
-                                                                    {field.tooltip}
+                            {mainSections.map((section, sIdx) => {
+                                if (!shouldShowItem(section, formData)) return null;
+
+                                return (
+                                    <div key={sIdx} className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+                                        <h2 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+                                            <span className="w-1.5 h-6 bg-accent rounded-full"></span>
+                                            {section.title}
+                                        </h2>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+                                            {section.fields.map((field, fIdx) => {
+                                                if (!shouldShowItem(field, formData)) return null;
+                                                
+                                                return (
+                                                    <div 
+                                                        key={fIdx} 
+                                                        className={field.class === 'full' ? 'sm:col-span-2' : 'sm:col-span-1'}
+                                                    >
+                                                        <div className="flex items-center justify-between mb-1.5">
+                                                            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide">
+                                                                {field.title}
+                                                                {field.valid === 'required' && <span className="text-rose-500 ml-1">*</span>}
+                                                            </label>
+                                                            {field.tooltip && (
+                                                                <div className="group relative">
+                                                                    <Icon name="info" className="w-3.5 h-3.5 text-slate-400 cursor-help" />
+                                                                    <div className="absolute bottom-full right-0 mb-2 hidden group-hover:block w-48 p-2 bg-slate-900 text-white text-[10px] rounded shadow-xl z-30">
+                                                                        {field.tooltip}
+                                                                    </div>
                                                                 </div>
-                                                            </div>
+                                                            )}
+                                                        </div>
+                                                        {renderFieldInternal(field, formData[field.name], (val) => handleChange(field.name, val))}
+                                                        {errors[field.name] && (
+                                                            <p className="mt-1.5 text-[10px] font-bold text-rose-500 flex items-center gap-1">
+                                                                <Icon name="alert-circle" className="w-3 h-3" /> {errors[field.name]}
+                                                            </p>
                                                         )}
                                                     </div>
-                                                    {renderFieldInternal(field, formData[field.name], (val) => handleChange(field.name, val))}
-                                                    {errors[field.name] && (
-                                                        <p className="mt-1.5 text-[10px] font-bold text-rose-500 flex items-center gap-1">
-                                                            <Icon name="alert-circle" className="w-3 h-3" /> {errors[field.name]}
-                                                        </p>
-                                                    )}
-                                                </div>
-                                            );
-                                        })}
+                                                );
+                                            })}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
 
                         {/* Sidebar Content */}
                         <div className="lg:col-span-4 space-y-6 sm:space-y-8">
-                            {sidebarSections.map((section, sIdx) => (
-                                <div key={sIdx} className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                                    <h2 className="text-sm font-bold text-slate-900 mb-5 uppercase tracking-wider border-b border-slate-100 pb-3">
-                                        {section.title}
-                                    </h2>
-                                    <div className="space-y-5">
-                                        {section.fields.map((field, fIdx) => {
-                                            if (!shouldShowField(field, formData)) return null;
+                            {sidebarSections.map((section, sIdx) => {
+                                if (!shouldShowItem(section, formData)) return null;
 
-                                            return (
-                                                <div key={fIdx}>
-                                                    {field.title && (
-                                                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
-                                                            {field.title}
-                                                        </label>
-                                                    )}
-                                                    {renderFieldInternal(field, formData[field.name], (val) => handleChange(field.name, val))}
-                                                    {errors[field.name] && (
-                                                        <p className="mt-1 text-[10px] font-bold text-rose-500 flex items-center gap-1">
-                                                            <Icon name="alert-circle" className="w-3 h-3" /> {errors[field.name]}
-                                                        </p>
-                                                    )}
-                                                </div>
-                                            );
-                                        })}
+                                return (
+                                    <div key={sIdx} className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                                        <h2 className="text-sm font-bold text-slate-900 mb-5 uppercase tracking-wider border-b border-slate-100 pb-3">
+                                            {section.title}
+                                        </h2>
+                                        <div className="space-y-5">
+                                            {section.fields.map((field, fIdx) => {
+                                                if (!shouldShowItem(field, formData)) return null;
+
+                                                return (
+                                                    <div key={fIdx}>
+                                                        {field.title && (
+                                                            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
+                                                                {field.title}
+                                                            </label>
+                                                        )}
+                                                        {renderFieldInternal(field, formData[field.name], (val) => handleChange(field.name, val))}
+                                                        {errors[field.name] && (
+                                                            <p className="mt-1 text-[10px] font-bold text-rose-500 flex items-center gap-1">
+                                                                <Icon name="alert-circle" className="w-3 h-3" /> {errors[field.name]}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
 
                     </div>
